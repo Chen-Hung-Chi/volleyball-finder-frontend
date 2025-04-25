@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify'
 import { AuthProvider } from '@/lib/auth-context'
 import 'react-toastify/dist/ReactToastify.css'
 import { Inter } from "next/font/google"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -50,6 +51,7 @@ export default function RootLayout({
             />
           </AuthProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
