@@ -4,14 +4,12 @@ import { Activity, ActivityWithParticipants, ActivityParticipantDto, User } from
 import { Position, Level, CityCode, DistrictCode } from './constants';
 import { ApiError, ActivityCreate, ActivityUpdate, ActivityJoinRequest, SearchParams } from './types/api';
 
-// Common utilities
+// --- Common utilities ---
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
   timeout: 10000,
 });
@@ -22,62 +20,58 @@ const dispatchAuthStateChange = () => {
   }
 };
 
-// Request/Response interceptors
+// --- Toast Control (防止狂跳) ---
+const errorToastId = 'api-error-toast';
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.data) {
-      const apiError = error.response.data as ApiError;
-      
-      // Specific business logic errors to be handled by components
-      const businessErrors = [
-        'ACTIVITY_FULL',
-        'ACTIVITY_ALREADY_JOINED',
-        'ACTIVITY_WAIT_30M', // Handled by component
-        'ACTIVITY_NOT_JOINED',
-        'ACTIVITY_LEAVED'
-      ];
-      
-      // If it's a business error, let the component handle it (show toast, etc.)
-      // Do NOT log it globally here.
-      if (businessErrors.includes(apiError.code)) {
-        return Promise.reject(error); 
-      }
-      
-      // --- Log and Handle OTHER errors globally --- 
-      console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} - Status: ${error.response?.status}`, apiError);
+    const config = error.config;
+    const responseData = error.response?.data;
+    const status = error.response?.status;
+    const message = responseData?.message || '操作失敗，請稍後再試';
+    const code = responseData?.code;
 
-      if (error.response?.status === 401 || apiError.code === 'USER_NOT_FOUND') {
-        console.log('Unauthorized (401) or User not found.');
-        dispatchAuthStateChange();
-        toast.error('請先登入');
-        window.location.href = '/login';
-      } else if (error.response?.status === 403) {
-        if (error.response?.data?.code === 'FORBIDDEN' && error.response?.data?.message?.includes('請求過於頻繁')) {
-          window.location.href = '/too-many-requests';
-          return Promise.reject(error);
-        }
-        toast.error("您沒有權限進行此操作");
-      } else {
-        toast.error(apiError.message || '發生錯誤，請稍後再試');
-      }
+    console.error(
+      `[API Error] ${config?.method?.toUpperCase()} ${config?.url} - Status: ${status}`,
+      responseData || error.message
+    );
 
+    if (status === 401 || code === 'USER_NOT_FOUND') {
+      dispatchAuthStateChange();
+      toast.error('請先登入', { toastId: errorToastId });
+      if (typeof window !== 'undefined') window.location.href = '/login';
       return Promise.reject(error);
     }
-    
-    console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error);
-    toast.error('網路錯誤，請稍後再試');
+
+    if (status === 403) {
+      if (code === 'FORBIDDEN' && message.includes('請求過於頻繁')) {
+        if (typeof window !== 'undefined') window.location.href = '/too-many-requests';
+      } else {
+        toast.error(message, { toastId: errorToastId });
+      }
+      return Promise.reject(error);
+    }
+
+    if (status >= 400 && status < 600) {
+      toast.error(message, { toastId: errorToastId });
+    } else if (!error.response) {
+      toast.error('網路錯誤，請檢查您的連線', { toastId: errorToastId });
+    } else {
+      toast.error('發生預期外的錯誤', { toastId: errorToastId });
+    }
+
     return Promise.reject(error);
   }
 );
 
-// Auth related APIs
+// --- API Service ---
 export const apiService = {
   isAuthenticated: async (): Promise<boolean> => {
     try {
       await api.get('/users/me');
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   },
@@ -91,15 +85,12 @@ export const apiService = {
     dispatchAuthStateChange();
   },
 
-  // User related APIs
   getCurrentUser: async (): Promise<User | null> => {
     try {
       const response = await api.get<User>('/users/me');
       return response.data;
     } catch (error: any) {
-      if (error?.response?.status === 404) {
-        return null;
-      }
+      if (error?.response?.status === 404) return null;
       throw error;
     }
   },
@@ -114,7 +105,30 @@ export const apiService = {
     return response.data;
   },
 
-  // Activity related APIs
+  checkNickname: async (nickname: string): Promise<{ available: boolean; message: string }> => {
+    try {
+      // Backend now returns 200 OK with { success: boolean }
+      const response = await api.get<{ success: boolean }>(`/users/check-nickname`, {
+        params: { nickname }
+      });
+      
+      // Map backend response to the frontend's expected format
+      if (response.data.success) {
+        return { available: true, message: "此暱稱可以使用" };
+      } else {
+        // Assume success: false means nickname is taken
+        return { available: false, message: "此暱稱已被使用" }; 
+      }
+
+    } catch (error: any) {
+      // Catch actual network/server errors (non-2xx status)
+      console.error('Unexpected error during nickname check:', error.response?.data || error.message);
+      // Global interceptor likely shows a toast
+      // Return unavailable as a safe default for UI feedback
+      return { available: false, message: "檢查暱稱時發生錯誤" }; 
+    }
+  },
+
   searchActivities: async (params: SearchParams): Promise<{ items: Activity[]; total: number; page: number; totalPages: number; }> => {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -122,7 +136,6 @@ export const apiService = {
         searchParams.append(key, String(value));
       }
     });
-    
     const response = await api.get<{ items: Activity[]; total: number; page: number; totalPages: number; }>(`/activities/search?${searchParams.toString()}`);
     return response.data;
   },
@@ -135,14 +148,14 @@ export const apiService = {
   getActivityParticipants: async (id: string): Promise<ActivityWithParticipants> => {
     const activityRes = await api.get<Activity>(`/activities/${id}`);
     const participantsRes = await api.get<ActivityParticipantDto[]>(`/activities/${id}/participants`);
-    
+
     const activity = activityRes.data;
     const participants = participantsRes.data;
     const captain = participants.find(p => p.isCaptain);
-    
+
     const captainAsUser: User | null = captain ? {
       id: captain.userId,
-      lineId: captain.lineId ?? "",
+      lineId: captain.lineId ?? '',
       nickname: captain.nickname,
       realName: captain.realName,
       position: captain.position as Position | undefined,
@@ -161,7 +174,7 @@ export const apiService = {
       ...activity,
       participants,
       waitingList: [],
-      captain: captainAsUser
+      captain: captainAsUser,
     };
   },
 
@@ -197,7 +210,6 @@ export const apiService = {
     return response.data;
   },
 
-  // Notification related APIs
   getNotifications: async (): Promise<any[]> => {
     const response = await api.get('/notifications');
     return response.data;
@@ -210,4 +222,4 @@ export const apiService = {
   markAllNotificationsAsRead: async (): Promise<void> => {
     await api.put('/notifications/read-all');
   },
-}; 
+};
