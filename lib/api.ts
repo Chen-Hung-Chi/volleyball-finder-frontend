@@ -32,36 +32,43 @@ api.interceptors.response.use(
     const message = responseData?.message || '操作失敗，請稍後再試';
     const code = responseData?.code;
 
+    // Log the error regardless
     console.error(
-      `[API Error] ${config?.method?.toUpperCase()} ${config?.url} - Status: ${status}`,
+      `[API Error Interceptor] ${config?.method?.toUpperCase()} ${config?.url} - Status: ${status}`,
       responseData || error.message
     );
 
+    // --- Specific Handling with Actions --- 
+
+    // Handle Unauthorized (Redirect)
     if (status === 401 || code === 'USER_NOT_FOUND') {
+      console.log('Interceptor: Unauthorized (401) or User not found. Redirecting.');
       dispatchAuthStateChange();
-      toast.error('請先登入', { toastId: errorToastId });
+      // Toast is now handled by handleApiError
       if (typeof window !== 'undefined') window.location.href = '/login';
-      return Promise.reject(error);
+      return Promise.reject(error); // Reject to stop further processing here
     }
 
+    // Handle Forbidden (Specific Rate Limit Redirect)
     if (status === 403) {
       if (code === 'FORBIDDEN' && message.includes('請求過於頻繁')) {
+        console.log('Interceptor: Rate limit exceeded (403). Redirecting.');
         if (typeof window !== 'undefined') window.location.href = '/too-many-requests';
-      } else {
-        toast.error(message, { toastId: errorToastId });
-      }
-      return Promise.reject(error);
+        return Promise.reject(error); // Reject to stop further processing here
+      } 
+      // For other 403 errors, just log (toast handled by handleApiError)
     }
 
-    if (status >= 400 && status < 600) {
-      toast.error(message, { toastId: errorToastId });
-    } else if (!error.response) {
-      toast.error('網路錯誤，請檢查您的連線', { toastId: errorToastId });
-    } else {
-      toast.error('發生預期外的錯誤', { toastId: errorToastId });
-    }
+    // --- Remove General Toasting --- 
+    // Remove the blocks that previously showed toasts for:
+    // - status >= 400 && status < 600
+    // - !error.response (network error)
+    // - other unexpected errors
 
-    return Promise.reject(error);
+    // --- Always reject --- 
+    // Ensure the promise is always rejected so that the calling code's
+    // catch block and handleApiError function can process the error.
+    return Promise.reject(error); 
   }
 );
 

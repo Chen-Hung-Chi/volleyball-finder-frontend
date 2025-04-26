@@ -5,9 +5,9 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { apiService } from "@/lib/api"
 import { useRouter } from "next/navigation"
-import { toast } from 'react-toastify'
 import { Activity } from "@/lib/types"
 import { useAuth } from "@/lib/auth-context"
+import { handleApiError } from "@/lib/error"
 
 export default function UserActivitiesPage() {
   const router = useRouter()
@@ -30,9 +30,8 @@ export default function UserActivitiesPage() {
       setIsLoading(true)
       const userActivities = await apiService.getUserActivities(user.id)
       setActivities(userActivities)
-    } catch (error) {
-      console.error("載入活動失敗:", error)
-      toast.error("載入活動失敗，請稍後再試")
+    } catch (error: any) {
+      handleApiError(error, router)
     } finally {
       setIsLoading(false)
     }

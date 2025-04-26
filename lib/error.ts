@@ -21,7 +21,8 @@ export enum ErrorCode {
   ACTIVITY_CANCELLED = 'ACTIVITY_CANCELLED',
   ACTIVITY_ALREADY_JOINED = 'ACTIVITY_ALREADY_JOINED',
   ACTIVITY_NOT_JOINED = 'ACTIVITY_NOT_JOINED',
-  ACTIVITY_PAST_DEADLINE = 'ACTIVITY_PAST_DEADLINE'
+  ACTIVITY_PAST_DEADLINE = 'ACTIVITY_PAST_DEADLINE',
+  ACTIVITY_WAIT_30M = 'ACTIVITY_WAIT_30M'
 }
 
 interface ErrorHandler {
@@ -76,26 +77,39 @@ const errorHandlers: Record<ErrorCode, ErrorHandler> = {
   },
   [ErrorCode.ACTIVITY_PAST_DEADLINE]: {
     message: '已超過報名截止時間'
+  },
+  [ErrorCode.ACTIVITY_WAIT_30M]: {
+    message: '退出後需等待 30 分鐘才能重新加入'
   }
 }
 
-export interface ApiError {
+export interface ApiErrorResponseData {
   code: string;
   message: string;
   timestamp?: string;
 }
 
 export const handleApiError = (error: any, router: AppRouterInstance) => {
-  console.error('API Error:', error);
+  // console.error('API Error Caught:', error); // REMOVED - Logging is now done in the interceptor
 
-  // 如果是 API 錯誤（有錯誤代碼）
-  if (error.code && error.code in ErrorCode) {
-    const handler = errorHandlers[error.code as ErrorCode];
-    toast.error(handler.message);
-    handler.action?.(router);
+  const apiErrorData: Partial<ApiErrorResponseData> = error?.response?.data || error || {};
+  const code = apiErrorData.code;
+  const message = apiErrorData.message;
+
+  if (code && code in ErrorCode) {
+    const handler = errorHandlers[code as ErrorCode];
+    const displayMessage = message || handler.message;
+
+    if (code === ErrorCode.ACTIVITY_WAIT_30M) {
+      toast.warning(displayMessage);
+      return; 
+    } 
+
+    toast.error(displayMessage);
+    handler.action?.(router); 
     return;
   }
 
-  // 如果是其他錯誤
-  toast.error(error.message || '操作失敗，請稍後再試');
+  const fallbackMessage = message || (error instanceof Error ? error.message : null) || '操作失敗，請稍後再試';
+  toast.error(fallbackMessage);
 }; 

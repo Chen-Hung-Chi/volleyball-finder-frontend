@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-context"
 import { apiService } from "@/lib/api"
 import { LOCATIONS } from "@/lib/constants"
 import { ActivityForm } from "@/components/activity/ActivityForm"
+import { handleApiError } from "@/lib/error"
 
 interface FormData {
   title: string
@@ -108,9 +109,8 @@ export default function NewActivity() {
       const activity = await apiService.createActivity(activityData)
       toast.success("活動已建立")
       router.push(`/activities/${activity.id}`)
-    } catch (error) {
-      console.error('Error in handleCreate:', error)
-      toast.error("建立失敗，請稍後再試")
+    } catch (error: any) {
+      handleApiError(error, router)
     } finally {
       setIsSaving(false)
     }

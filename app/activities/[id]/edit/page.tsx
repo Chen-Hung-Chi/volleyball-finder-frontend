@@ -10,6 +10,7 @@ import { apiService } from "@/lib/api"
 import { LOCATIONS } from "@/lib/constants"
 import { format } from "date-fns"
 import { ActivityForm } from "@/components/activity/ActivityForm"
+import { handleApiError } from "@/lib/error"
 
 interface FormData {
   title: string
@@ -102,17 +103,18 @@ export default function EditActivity() {
           femaleQuota: activity.femaleQuota || 0,
           femalePriority: activity.femalePriority || false
         })
-      } catch (error) {
-        console.error('Error fetching activity:', error)
-        toast.error('載入活動資料失敗')
+      } catch (error: any) {
+        handleApiError(error, router)
         router.push('/activities')
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchActivity()
-  }, [params?.id, router, authUser?.id])
+    if (authUser !== undefined) {
+      fetchActivity()
+    }
+  }, [params?.id, router, authUser])
 
   const handleSave = async () => {
     if (!authUser || !authUser.id) {
@@ -163,9 +165,8 @@ export default function EditActivity() {
       const activity = await apiService.updateActivity(activityId, activityData)
       toast.success("活動已更新")
       router.push(`/activities/${activityId}`)
-    } catch (error) {
-      console.error('Error in handleSave:', error)
-      toast.error("更新失敗，請稍後再試")
+    } catch (error: any) {
+      handleApiError(error, router)
     } finally {
       setIsSaving(false)
     }
