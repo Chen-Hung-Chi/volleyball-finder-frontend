@@ -1,96 +1,91 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
-import { Client } from '@stomp/stompjs';
-import { toast } from 'react-toastify';
-import { useAuth } from '@/lib/auth-context';
+"use client";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/ws';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { Client, IMessage } from '@stomp/stompjs';
+import { toast } from 'react-toastify';
 
 export const useWebSocket = (userId?: string) => {
-  const client = useRef<Client | null>(null);
+  const clientRef = useRef<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const connect = useCallback(() => {
-    if (!userId) return;
+  const getWebSocketUrl = () => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+    try {
+      const url = new URL(apiUrl);
+      const protocol = url.protocol === 'https:' ? 'wss' : 'ws';
+      const port = url.port ? `:${url.port}` : '';
+      return `${protocol}://${url.hostname}${port}/ws`;
+    } catch {
+      return 'ws://localhost:8080/ws';
+    }
+  };
 
-    client.current = new Client({
-      brokerURL: SOCKET_URL,
-      connectHeaders: {
-        userId: userId,
-      },
-      debug: (str) => {
-        console.log('STOMP:', str);
-      },
+  const handleNotification = useCallback((message: IMessage) => {
+    try {
+      const notification = JSON.parse(message.body);
+      if (notification?.message) {
+        toast.info(notification.message, { toastId: "ws-notification" });
+      }
+    } catch (error) {
+      console.error('Failed to parse notification:', error);
+    }
+  }, []);
+
+  const connect = useCallback(() => {
+    if (!userId || clientRef.current?.active) return;
+
+    const stompClient = new Client({
+      brokerURL: getWebSocketUrl(),
+      connectHeaders: { userId },
+      debug: (str) => { }, // silent unless debug
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
-    client.current.onConnect = () => {
-      console.log('Connected to WebSocket');
+    stompClient.onConnect = () => {
+      console.log('WebSocket Connected');
       setIsConnected(true);
-      
-      // Subscribe to user-specific notifications
-      if (client.current && userId) {
-        client.current.subscribe(`/user/${userId}/queue/notifications`, (message) => {
-          try {
-            const notification = JSON.parse(message.body);
-            toast.info(notification.message);
-          } catch (error) {
-            console.error('Error parsing notification:', error);
-          }
-        });
-      }
+      stompClient.subscribe(`/user/${userId}/queue/notifications`, handleNotification);
     };
 
-    client.current.onDisconnect = () => {
-      console.log('Disconnected from WebSocket');
+    stompClient.onDisconnect = () => {
+      console.log('WebSocket Disconnected');
       setIsConnected(false);
     };
 
-    client.current.onStompError = (frame) => {
-      console.error('STOMP error:', frame);
+    stompClient.onStompError = (frame) => {
+      console.error('STOMP Error:', frame.headers['message'], frame.body);
       setIsConnected(false);
     };
 
-    try {
-      client.current.activate();
-    } catch (error) {
-      console.error('Error activating WebSocket client:', error);
-      setIsConnected(false);
-    }
-  }, [userId]);
+    stompClient.activate();
+    clientRef.current = stompClient;
+  }, [userId, handleNotification]);
 
-  const disconnect = useCallback(() => {
-    if (client.current) {
+  const disconnect = useCallback(async () => {
+    console.log('Disconnecting WebSocket...');
+    if (clientRef.current) {
       try {
-        client.current.deactivate();
-        client.current = null;
-        setIsConnected(false);
+        await clientRef.current.deactivate();
       } catch (error) {
-        console.error('Error disconnecting WebSocket client:', error);
+        console.error('Error deactivating WebSocket:', error);
+      } finally {
+        clientRef.current = null;
+        setIsConnected(false);
       }
     }
   }, []);
 
-  // Mark notification as read
-  const markAsRead = useCallback((notificationId: string) => {
-    if (!client.current || !isConnected) {
-      console.error('WebSocket is not connected');
-      return Promise.reject(new Error('WebSocket is not connected'));
+  const markAsRead = useCallback(async (notificationId: string) => {
+    if (!clientRef.current?.active || !isConnected) {
+      console.warn('WebSocket not connected');
+      throw new Error('WebSocket is not connected');
     }
-
-    return new Promise((resolve, reject) => {
-      try {
-        client.current!.publish({
-          destination: '/app/notifications.markAsRead',
-          body: JSON.stringify(notificationId),
-          headers: { 'content-type': 'application/json' }
-        });
-        resolve(true);
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
-        reject(error);
-      }
+    clientRef.current.publish({
+      destination: '/app/notifications.markAsRead',
+      body: JSON.stringify({ notificationId }),
+      headers: { 'content-type': 'application/json' }
     });
   }, [isConnected]);
 
@@ -98,12 +93,13 @@ export const useWebSocket = (userId?: string) => {
     if (userId) {
       connect();
     }
-    return () => disconnect();
+    return () => {
+      disconnect();
+    };
   }, [userId, connect, disconnect]);
 
-  return { 
-    client: client.current,
+  return {
     isConnected,
-    markAsRead
+    markAsRead,
   };
-}; 
+};
