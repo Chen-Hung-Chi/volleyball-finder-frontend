@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation"
 import { POSITIONS, LEVELS, GENDERS } from "@/lib/constants"
 import { useProfileForm } from "@/lib/hooks/useProfileForm"
 import { ProfileFormSkeleton } from "@/components/profile/ProfileFormSkeleton"
-import { apiService } from "@/lib/api"
+import { apiService } from "@/lib/apiService"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -58,14 +58,14 @@ function ProfilePageContent() {
 
   // Debounced function to perform the actual check
   const checkNicknameAvailability = useCallback(async (nickname: string) => {
-     // Don't check if empty or hasn't changed from initial
+    // Don't check if empty or hasn't changed from initial
     if (!nickname || nickname === initialNickname) {
       // Reset if it was previously invalid and now matches initial or is empty
       if ((nickname === initialNickname || !nickname) && nicknameStatus.status === 'taken') {
-         setNicknameStatus({ status: 'idle', message: '' });
+        setNicknameStatus({ status: 'idle', message: '' });
       } else if (!nickname && nicknameStatus.status !== 'idle') {
-         // Clear status if field is emptied
-         setNicknameStatus({ status: 'idle', message: '' });
+        // Clear status if field is emptied
+        setNicknameStatus({ status: 'idle', message: '' });
       }
       return;
     }
@@ -81,7 +81,7 @@ function ProfilePageContent() {
       // Errors are now primarily handled by the global interceptor toast
       // We still set status to taken for UI feedback, but avoid double console.error
       console.log("Error caught during nickname check processing:", e); // Log for debug if needed
-      setNicknameStatus({ status: 'taken', message: '檢查時發生錯誤' }); 
+      setNicknameStatus({ status: 'taken', message: '檢查時發生錯誤' });
     }
   }, [initialNickname, nicknameStatus.status]); // Keep nicknameStatus.status dependency for now
 
@@ -94,11 +94,11 @@ function ProfilePageContent() {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
+
     // Clear status immediately if input is empty or matches initial
     if (!currentNickname || currentNickname === initialNickname) {
-       setNicknameStatus({ status: 'idle', message: '' });
-       return; // Don't set a timer if no check is needed
+      setNicknameStatus({ status: 'idle', message: '' });
+      return; // Don't set a timer if no check is needed
     }
 
     // Set a new timer
@@ -120,7 +120,7 @@ function ProfilePageContent() {
     <div className="container mx-auto p-4 max-w-2xl">
       <Card className="p-6">
         <h1 className="text-2xl font-bold mb-6">個人資料</h1>
-        
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -185,7 +185,7 @@ function ProfilePageContent() {
                   : errors.nickname && nicknameStatus.status === 'idle'
                     ? errors.nickname.message
                     : <>&nbsp;</>
-              }
+                }
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ function ProfilePageContent() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="volleyballAge">球齡</Label>
               <Controller
                 name="volleyballAge"
@@ -321,15 +321,15 @@ function ProfilePageContent() {
           </div>
 
           <div className="flex justify-end space-x-4 mt-8">
-            <Button 
+            <Button
               type="button"
-              variant="outline" 
+              variant="outline"
               onClick={() => router.push('/')}
               disabled={isSubmitting}
             >
               取消
             </Button>
-            <Button 
+            <Button
               type="submit"
               disabled={isSubmitting || nicknameStatus.status === 'taken'}
             >

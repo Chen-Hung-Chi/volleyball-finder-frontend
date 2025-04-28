@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useParams, useRouter } from "next/navigation"
 import { toast } from 'react-toastify'
 import { useAuth } from "@/lib/auth-context"
-import { apiService } from "@/lib/api"
+import { apiService } from "@/lib/apiService"
 import { LOCATIONS } from "@/lib/constants"
 import { format } from "date-fns"
 import { ActivityForm } from "@/components/activity/ActivityForm"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
-import { apiService } from '@/lib/api';
+import { apiService } from '@/lib/apiService';
 import { Activity } from '@/lib/types/activity';
 import { SearchParams } from '@/lib/types/api';
 

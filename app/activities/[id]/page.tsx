@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation"
 import { toast } from 'react-toastify'
 import { ActivityWithParticipants } from "@/lib/types"
 import { useAuth } from "@/lib/auth-context"
-import { apiService } from "@/lib/api"
+import { apiService } from "@/lib/apiService"
 import { Calendar, MapPin, Users, ArrowLeft, DollarSign, Star } from "lucide-react"
 import { ParticipantList } from "@/components/activity/ParticipantList"
 import Link from "next/link"

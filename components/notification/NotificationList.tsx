@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useWebSocket } from '@/lib/hooks/useWebSocket';
 import { useAuth } from '@/lib/auth-context';
-import { apiService } from '@/lib/api';
+import { apiService } from '@/lib/apiService';
 import { toast } from 'react-toastify';
 import { Notification } from "@/lib/types/notification";
 import { NotificationDropdown } from './NotificationDropdown';

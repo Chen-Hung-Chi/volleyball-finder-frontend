@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { apiService } from "@/lib/api"
+import { apiService } from "@/lib/apiService"
 import { useRouter } from "next/navigation"
 import { Activity } from "@/lib/types"
 import { useAuth } from "@/lib/auth-context"

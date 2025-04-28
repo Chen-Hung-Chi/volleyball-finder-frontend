@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Activity } from '@/lib/types';
-import { apiService } from '@/lib/api';
+import { apiService } from '@/lib/apiService';
 
 export function useMyActivities() {
   const [activities, setActivities] = useState<Activity[]>([]);

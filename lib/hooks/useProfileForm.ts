@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 import { useAuth } from '@/lib/auth-context';
-import { apiService } from '@/lib/api';
+import { apiService } from '@/lib/apiService';
 import { profileSchema, ProfileFormData } from '@/lib/schemas/profile';
-import { User } from '@/lib/types';
 
 export function useProfileForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { user, setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);

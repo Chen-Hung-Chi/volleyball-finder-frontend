@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter
-import { apiService } from '@/lib/api';
+import { apiService } from '@/lib/apiService';
 import { User, Activity } from '@/lib/types';
 
 export function useUserProfile(userId: string | null) {

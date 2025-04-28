@@ -103,7 +103,7 @@ export function findDistrictByCode(cityCode?: string, districtCode?: string) {
 export function formatTaipeiTime(dateInput: string | Date, includeYear = false) {
   // Handle both string and Date inputs
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  
+
   // Check if date is valid after conversion
   if (isNaN(date.getTime())) {
     return "無效日期"; // Or return an empty string, or handle as needed
@@ -137,8 +137,8 @@ export function getActivityBadgeStatus(activity: Activity | ActivityWithParticip
   const isPast = new Date(activity.dateTime) < new Date();
 
   if (isPast) {
-    return { 
-      variant: "default" as const, 
+    return {
+      variant: "default" as const,
       label: "已過期",
       // Use the same distinct grey style we defined earlier
       className: "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
@@ -146,10 +146,10 @@ export function getActivityBadgeStatus(activity: Activity | ActivityWithParticip
   }
 
   // Determine participant count (handle both Activity and ActivityWithParticipants)
-  const participantsCount = ('participants' in activity) 
-                            ? activity.participants.length 
-                            : activity.currentParticipants || 0;
-                            
+  const participantsCount = ('participants' in activity)
+    ? activity.participants.length
+    : activity.currentParticipants || 0;
+
   const maxParticipants = activity.maxParticipants;
 
   // Status logic for non-past activities
@@ -162,4 +162,41 @@ export function getActivityBadgeStatus(activity: Activity | ActivityWithParticip
   if (isAlmostFull) return { variant: "secondary" as const, label: "即將額滿", className: "" };
   return { variant: "default" as const, label: "招募中", className: "" };
 }
-// --- End of New Utility Function ---
+
+
+/**
+ * 安全使用 localStorage，防止因禁用、隱私模式、Quota 滿等錯誤而爆炸
+ */
+export const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window !== 'undefined') {
+        return localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.error('safeLocalStorage.getItem failed:', e);
+    }
+    return null;
+  },
+
+  setItem: (key: string, value: string) => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(key, value);
+      }
+    } catch (e) {
+      console.error('safeLocalStorage.setItem failed:', e);
+    }
+  },
+
+  removeItem: (key: string) => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(key);
+      }
+    } catch (e) {
+      console.error('safeLocalStorage.removeItem failed:', e);
+    }
+  }
+};
+
