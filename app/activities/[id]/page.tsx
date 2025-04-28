@@ -15,6 +15,8 @@ import Link from "next/link"
 import { formatTaipeiTime, cn } from '@/lib/utils'
 import { useActivityDetails } from '@/lib/hooks/useActivityDetails'
 import { handleApiError } from '@/lib/error'
+import { AddToGoogleCalendarButton } from '@/components/activity/AddToGoogleCalendarButton'
+import { Copy, Check } from "lucide-react";
 
 export default function ActivityDetail() {
   const params = useParams()
@@ -24,6 +26,7 @@ export default function ActivityDetail() {
   const [isLoading, setIsLoading] = useState(true)
   const [isJoining, setIsJoining] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   const activityId = useMemo(() => {
     if (!params?.id) return null;
@@ -73,17 +76,40 @@ export default function ActivityDetail() {
       return;
     }
 
+    const currentActivityDetails = {
+      title: activity.title,
+      description: activity.description,
+      location: locationString,
+      startTime: activity.dateTime,
+      durationMinutes: activity.duration
+    };
+
     try {
       setIsJoining(true);
       await apiService.joinActivity(activityId, { position: user.position || 'NONE' });
       await fetchActivity();
-      toast.success('報名成功！');
+
+      toast.success(
+        ({ closeToast }) => (
+          <div className="flex flex-col items-start space-y-2">
+            <span>報名成功！</span>
+            <AddToGoogleCalendarButton
+              title={currentActivityDetails.title}
+              description={currentActivityDetails.description}
+              location={currentActivityDetails.location}
+              startTime={currentActivityDetails.startTime}
+              durationMinutes={currentActivityDetails.durationMinutes}
+            />
+          </div>
+        ),
+        { autoClose: 5000 }
+      );
     } catch (error: any) {
       handleApiError(error, router);
     } finally {
       setIsJoining(false);
     }
-  }, [user, activityId, router, fetchActivity, activity]);
+  }, [user, activityId, router, fetchActivity, activity, locationString]);
 
   const handleLeave = useCallback(async () => {
     if (!user || !activityId) return;
@@ -113,6 +139,16 @@ export default function ActivityDetail() {
     return `${gender === 'male' ? '男' : '女'}生上限 ${quota} 人`;
   };
 
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(window.location.href)          // 把目前網址寫進剪貼簿
+      .then(() => {
+        setCopied(true);                        // 換成「已複製」
+        setTimeout(() => setCopied(false), 3000); // 3 秒後恢復
+      })
+      .catch(() => toast.error("複製失敗，請手動複製"));
+  };
+
   // Memoize the formatted quota outputs
   const maleQuotaDisplay = useMemo(() => {
     return formatQuota(activity?.maleQuota, 'male');
@@ -121,8 +157,6 @@ export default function ActivityDetail() {
   const femaleQuotaDisplay = useMemo(() => {
     return formatQuota(activity?.femaleQuota, 'female');
   }, [activity?.femaleQuota]);
-
-
 
   if (isLoading) {
     return (
@@ -155,22 +189,41 @@ export default function ActivityDetail() {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <CardTitle className="text-2xl">{activity.title}</CardTitle>
+                <CardTitle className="text-2xl">{activity.title}
+                  <Button
+                    onClick={handleCopy}
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    title="複製活動連結"
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+
+                </CardTitle>
+
                 <CardDescription>
                   由 <Link href={`/profile/${activity.createdBy}`} className="hover:underline">{activity.captain?.nickname}</Link> 建立
                 </CardDescription>
               </div>
-              {user && (
-                <div className="flex items-center gap-2">
-                  {isCreator ? (
-                    <Badge variant="secondary">你是建立者</Badge>
-                  ) : (
-                    <Badge variant={status.variant} className={cn(status.className)}>
-                      {status.label}
-                    </Badge>
-                  )}
-                </div>
-              )}
+
+              <div className="flex items-center gap-2">
+                {/* 只有「登入 + 自己是建立者」才顯示 */}
+                {user && isCreator && (
+                  <Badge variant="secondary">你是建立者</Badge>
+                )}
+
+                {/* 任何人都看得到活動狀態 */}
+                {!isCreator && (
+                  <Badge variant={status.variant} className={cn(status.className)}>
+                    {status.label}
+                  </Badge>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -238,9 +291,18 @@ export default function ActivityDetail() {
                     編輯活動
                   </Button>
                 ) : !isPastActivity && isParticipant ? (
-                  <Button onClick={handleLeave} disabled={isLeaving} variant="destructive">
-                    {isLeaving ? "取消報名中..." : "取消報名"}
-                  </Button>
+                  <>
+                    <AddToGoogleCalendarButton
+                      title={activity.title}
+                      description={activity.description}
+                      location={locationString}
+                      startTime={activity.dateTime}
+                      durationMinutes={activity.duration}
+                    />
+                    <Button onClick={handleLeave} disabled={isLeaving} variant="destructive">
+                      {isLeaving ? "取消報名中..." : "取消報名"}
+                    </Button>
+                  </>
                 ) : !isPastActivity && !isFullWithWaitingList && (
                   <Button onClick={handleJoin} disabled={isJoining}>
                     {isJoining ? "報名中..." :

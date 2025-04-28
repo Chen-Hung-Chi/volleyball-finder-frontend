@@ -9,6 +9,7 @@ import { apiService } from "@/lib/apiService"
 import { useAuth } from "@/lib/auth-context"
 import { POSITIONS } from "@/lib/constants"
 
+
 export default function JoinActivity() {
   const params = useParams()
   const router = useRouter()
