@@ -17,23 +17,23 @@ export function UserMenu() {
   const router = useRouter()
   const { user, logout } = useAuth()
 
+  const menuItems = [
+    { label: "我的資訊", path: "/profile" },
+    { label: "我的活動", path: "/activities" },
+    { label: "贊助商", path: "/sponsors" },
+  ]
+
   const handleLogout = async () => {
     try {
-      await logout();
-      toast.success("登出成功");
+      await logout()
+      toast.success("登出成功")
     } catch (error) {
-       console.error("Logout failed:", error);
-       toast.error("登出失敗");
+      console.error("Logout failed:", error)
+      toast.error("登出失敗")
     }
   }
 
-  const handleProfileClick = () => {
-    router.push('/profile')
-  }
-
-  if (!user) {
-    return null;
-  }
+  if (!user) return null
 
   return (
     <DropdownMenu>
@@ -43,16 +43,15 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <div className="px-2 py-1.5 text-sm font-semibold">
+        <div className="px-2 py-1.5 text-sm font-semibold truncate max-w-[180px]">
           {user.nickname || "使用者"}
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleProfileClick}>
-          我的資訊
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push('/activities')}>
-          我的活動
-        </DropdownMenuItem>
+        {menuItems.map(({ label, path }) => (
+          <DropdownMenuItem key={path} onClick={() => router.push(path)}>
+            {label}
+          </DropdownMenuItem>
+        ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           登出
@@ -60,4 +59,4 @@ export function UserMenu() {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-} 
+}

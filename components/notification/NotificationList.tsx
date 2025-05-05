@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useWebSocket } from '@/lib/hooks/useWebSocket';
 import { useAuth } from '@/lib/auth-context';
 import { apiService } from '@/lib/apiService';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { Notification } from "@/lib/types/notification";
 import { NotificationDropdown } from './NotificationDropdown';
 import { NotificationBellTrigger } from './NotificationBellTrigger';
@@ -13,7 +12,6 @@ export const NotificationList = React.memo(function NotificationList() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  const { markAsRead } = useWebSocket(user?.id);
 
   const fetchNotifications = useCallback(async () => {
     if (!user?.id) {
@@ -39,25 +37,6 @@ export const NotificationList = React.memo(function NotificationList() {
       fetchNotifications();
     }
   }, [isVisible, user?.id, fetchNotifications]);
-
-  const handleMarkAsRead = async (notificationId: string) => {
-    if (!user?.id) return;
-    const originalNotifications = [...notifications];
-    try {
-      setNotifications((prev: Notification[]) =>
-        prev.map(notification =>
-          notification.id === notificationId
-            ? { ...notification, read: true }
-            : notification
-        )
-      );
-      await markAsRead(notificationId);
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      setNotifications(originalNotifications);
-      toast.error("標記已讀失敗");
-    }
-  };
 
   const toggleNotifications = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -104,9 +83,7 @@ export const NotificationList = React.memo(function NotificationList() {
         isLoading={isLoading}
         error={error}
         notifications={notifications}
-        onMarkAsRead={handleMarkAsRead}
       />
     </div>
   );
 });
-NotificationList.displayName = 'NotificationList'; 

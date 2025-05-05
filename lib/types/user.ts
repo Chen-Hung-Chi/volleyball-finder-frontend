@@ -4,6 +4,7 @@ import type { Activity } from './activity';
 export interface User {
   id: string;
   lineId: string;
+  role: 'USER' | 'SPONSOR' | 'ADMIN';
   realName?: string;
   nickname: string;
   position?: Position;

@@ -1,115 +1,28 @@
 import { toast } from 'react-toastify';
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
-
-export enum ErrorCode {
-  // 通用錯誤
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  INVALID_REQUEST = 'INVALID_REQUEST',
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-  NOT_FOUND = 'NOT_FOUND',
-
-  // 用戶相關錯誤
-  USER_NOT_FOUND = 'USER_NOT_FOUND',
-  USER_ALREADY_EXISTS = 'USER_ALREADY_EXISTS',
-  INVALID_USER_DATA = 'INVALID_USER_DATA',
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-
-  // 活動相關錯誤
-  ACTIVITY_NOT_FOUND = 'ACTIVITY_NOT_FOUND',
-  ACTIVITY_FULL = 'ACTIVITY_FULL',
-  ACTIVITY_CANCELLED = 'ACTIVITY_CANCELLED',
-  ACTIVITY_ALREADY_JOINED = 'ACTIVITY_ALREADY_JOINED',
-  ACTIVITY_NOT_JOINED = 'ACTIVITY_NOT_JOINED',
-  ACTIVITY_PAST_DEADLINE = 'ACTIVITY_PAST_DEADLINE',
-  ACTIVITY_WAIT_30M = 'ACTIVITY_WAIT_30M'
-}
-
-interface ErrorHandler {
-  message: string;
-  action?: (router: AppRouterInstance) => void;
-}
-
-const errorHandlers: Record<ErrorCode, ErrorHandler> = {
-  [ErrorCode.INTERNAL_ERROR]: {
-    message: '系統錯誤，請稍後再試'
-  },
-  [ErrorCode.INVALID_REQUEST]: {
-    message: '無效的請求'
-  },
-  [ErrorCode.UNAUTHORIZED]: {
-    message: '請先登入',
-    action: (router) => router.push('/login')
-  },
-  [ErrorCode.FORBIDDEN]: {
-    message: '無權限執行此操作'
-  },
-  [ErrorCode.NOT_FOUND]: {
-    message: '找不到資源'
-  },
-  [ErrorCode.USER_NOT_FOUND]: {
-    message: '請先完成個人資料設定',
-    action: (router) => router.push('/profile')
-  },
-  [ErrorCode.USER_ALREADY_EXISTS]: {
-    message: '用戶已存在'
-  },
-  [ErrorCode.INVALID_USER_DATA]: {
-    message: '無效的用戶資料'
-  },
-  [ErrorCode.INVALID_CREDENTIALS]: {
-    message: '無效的憑證'
-  },
-  [ErrorCode.ACTIVITY_NOT_FOUND]: {
-    message: '找不到此活動'
-  },
-  [ErrorCode.ACTIVITY_FULL]: {
-    message: '活動已額滿'
-  },
-  [ErrorCode.ACTIVITY_CANCELLED]: {
-    message: '活動已取消'
-  },
-  [ErrorCode.ACTIVITY_ALREADY_JOINED]: {
-    message: '你已經報名過此活動'
-  },
-  [ErrorCode.ACTIVITY_NOT_JOINED]: {
-    message: '你尚未報名此活動'
-  },
-  [ErrorCode.ACTIVITY_PAST_DEADLINE]: {
-    message: '已超過報名截止時間'
-  },
-  [ErrorCode.ACTIVITY_WAIT_30M]: {
-    message: '退出後需等待 30 分鐘才能重新加入'
-  }
-}
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export interface ApiErrorResponseData {
-  code: string;
-  message: string;
+  code?: string;
+  message?: string;
   timestamp?: string;
 }
 
-export const handleApiError = (error: any, router: AppRouterInstance) => {
-  // console.error('API Error Caught:', error); // REMOVED - Logging is now done in the interceptor
-
-  const apiErrorData: Partial<ApiErrorResponseData> = error?.response?.data || error || {};
+export const handleApiError = (error: any, router?: AppRouterInstance) => {
+  const apiErrorData: Partial<ApiErrorResponseData> = error?.response?.data || {};
   const code = apiErrorData.code;
   const message = apiErrorData.message;
 
-  if (code && code in ErrorCode) {
-    const handler = errorHandlers[code as ErrorCode];
-    const displayMessage = message || handler.message;
-
-    if (code === ErrorCode.ACTIVITY_WAIT_30M) {
-      toast.warning(displayMessage);
-      return; 
-    } 
-
-    toast.error(displayMessage);
-    handler.action?.(router); 
+  // 顯示後端的 message，如果有的話
+  if (message) {
+    toast.error(message);
     return;
   }
 
-  const fallbackMessage = message || (error instanceof Error ? error.message : null) || '操作失敗，請稍後再試';
-  toast.error(fallbackMessage);
-}; 
+  // fallback 顯示
+  const fallback =
+    error instanceof Error
+      ? error.message
+      : '操作失敗，請稍後再試';
+
+  toast.error(fallback);
+};

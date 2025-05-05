@@ -1,5 +1,6 @@
 // lib/api.ts
 import axios from 'axios';
+import { Sponsor, SponsorFormData } from './types/sponsor';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -51,4 +52,31 @@ export const handleAuthError = (error: any) => {
 
   console.error('Unexpected auth error:', error);
   return 'error';
+};
+
+// ==================
+// Sponsors API
+// ==================
+
+// Fetch all sponsors
+export const getAllSponsors = async (): Promise<Sponsor[]> => {
+  const response = await api.get<Sponsor[]>('/sponsors');
+  return response.data;
+};
+
+// Fetch a single sponsor by ID
+export const getSponsor = async (id: string): Promise<Sponsor> => {
+  const response = await api.get<Sponsor>(`/sponsors/${id}`);
+  return response.data;
+};
+
+// Create a new sponsor
+export const createSponsor = async (data: SponsorFormData): Promise<void> => {
+  await api.post('/sponsors', data);
+};
+
+// Update an existing sponsor
+export const updateSponsor = async (id: string, data: SponsorFormData): Promise<boolean> => {
+  const response = await api.put<boolean>(`/sponsors/${id}`, data);
+  return response.data; // Backend returns boolean
 };
