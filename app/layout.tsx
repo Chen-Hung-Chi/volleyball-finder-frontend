@@ -8,6 +8,7 @@ import { AuthProvider } from '@/lib/auth-context'
 import 'react-toastify/dist/ReactToastify.css'
 import { Inter } from "next/font/google"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -52,6 +53,22 @@ export default function RootLayout({
           </AuthProvider>
         </ThemeProvider>
         <SpeedInsights />
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-WSF1K5DRZV"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-WSF1K5DRZV');
+            `,
+          }}
+        />
       </body>
     </html>
   )
