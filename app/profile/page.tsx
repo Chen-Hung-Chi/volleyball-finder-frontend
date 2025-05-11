@@ -122,7 +122,7 @@ function ProfilePageContent() {
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card className="p-6">
-        <h1 className="text-2xl font-bold mb-6">個人資料</h1>
+        <h1 className="text-2xl font-bold mb-6">個人資訊</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Real Name Field */}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Notification } from '@/lib/types/notification';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Loader2 } from 'lucide-react';
 import { NotificationItem } from './NotificationItem';
@@ -10,7 +9,6 @@ export const NotificationDropdown = React.memo(({
   isLoading, 
   error, 
   notifications, 
-  onMarkAsRead,
   isVisible 
 }: NotificationDropdownProps) => {
   if (!isVisible) {
@@ -37,7 +35,6 @@ export const NotificationDropdown = React.memo(({
           <NotificationItem 
             key={notification.id} 
             notification={notification} 
-            onMarkAsRead={onMarkAsRead} 
           />
         ))}
       </div>

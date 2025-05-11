@@ -20,7 +20,6 @@ export function UserMenu() {
   const menuItems = [
     { label: "我的資訊", path: "/profile" },
     { label: "我的活動", path: "/activities" },
-    { label: "贊助商", path: "/sponsors" },
   ]
 
   const handleLogout = async () => {

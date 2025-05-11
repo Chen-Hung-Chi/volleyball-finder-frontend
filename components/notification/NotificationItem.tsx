@@ -1,10 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn, formatTaipeiTime } from '@/lib/utils';
-import { Notification } from '@/lib/types/notification';
 import { NotificationItemProps } from './type'; // Import from local type file
 
-export const NotificationItem = React.memo(({ notification, onMarkAsRead }: NotificationItemProps) => (
+export const NotificationItem = React.memo(({ notification }: NotificationItemProps) => (
   <div
     key={notification.id}
     className={cn(
@@ -29,7 +28,6 @@ export const NotificationItem = React.memo(({ notification, onMarkAsRead }: Noti
           className="text-xs h-auto p-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           onClick={(e) => {
             e.stopPropagation(); // Prevent closing dropdown
-            onMarkAsRead(notification.id);
           }}
         >
           標記為已讀
