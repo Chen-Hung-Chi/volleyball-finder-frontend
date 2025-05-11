@@ -13,44 +13,56 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-export default function SponsorsPage() {
-  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user, loading: authLoading } = useAuth();
-  const [mySponsorId, setMySponsorId] = useState<string | null>(null);
+const placeholderLogo = "/placeholder-logo.svg";
 
-  const isSponsorUser = user?.role === "SPONSOR";
-  const placeholderLogo = "/images/placeholder-logo.svg";
+export default function SponsorsPage() {
+  /**
+   * state 管理
+   * - sponsors: 贊助商列表
+   * - status: 資料請求狀態 (idle | loading | error | success)
+   * - error: 錯誤訊息 (若有)
+   */
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "error" | "success">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
   const router = useRouter();
 
+  // 取得贊助商
   useEffect(() => {
-    const fetchSponsors = async () => {
+    let ignore = false;
+
+    async function fetchSponsors() {
       try {
-        setLoading(true);
+        setStatus("loading");
         const data = await getAllSponsors();
-        setSponsors(data);
-        setError(null);
+        if (!ignore) {
+          setSponsors(data);
+          setStatus("success");
+        }
       } catch (err) {
         console.error("Failed to fetch sponsors:", err);
-        setError("無法載入贊助商列表，請稍後再試。");
-      } finally {
-        setLoading(false);
+        if (!ignore) {
+          setError("無法載入贊助商列表，請稍後再試。");
+          setStatus("error");
+        }
       }
-    };
+    }
 
     fetchSponsors();
+    return () => {
+      ignore = true; // 避免組件卸載後呼叫 setState()
+    };
   }, []);
 
-  useEffect(() => {
-    if (isSponsorUser && sponsors.length > 0 && user?.id) {
-      const found = sponsors.find((s) => s.userId === user.id);
-      setMySponsorId(found?.id ?? null);
-    }
-  }, [sponsors, user, isSponsorUser, authLoading]);
-
+  const isSponsorUser = user?.role === "SPONSOR";
+  const mySponsorId = isSponsorUser ? sponsors.find((s) => s.userId === user?.id)?.id ?? null : null;
   const activeSponsors = sponsors.filter((s) => s.isActive !== false);
 
+  /**
+   * 渲染單一贊助商卡片
+   */
   const renderSponsorCard = (sponsor: Sponsor) => {
     const hasValidLogo = sponsor.logoUrl?.match(/\.(jpg|jpeg|png|svg|webp)$/i);
     return (
@@ -70,12 +82,15 @@ export default function SponsorsPage() {
     );
   };
 
+  /**
+   * 加入贊助商按鈕
+   */
   const handleJoinSponsorClick = () => {
-    if (!user || user.role !== "SPONSOR") {
+    if (!isSponsorUser) {
       toast.error("您不是合作夥伴，如需申請請聯絡管理員(LineId:Nisakevo)");
       return;
     }
-    router.push("/sponsors/new");
+    router.push(mySponsorId ? `/sponsors/${mySponsorId}` : "/sponsors/new");
   };
 
   return (
@@ -85,26 +100,34 @@ export default function SponsorsPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10">我們的合作夥伴</h2>
 
-          {loading ? (
+          {status === "loading" && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
               {Array.from({ length: 10 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[4/3] rounded-lg" />
               ))}
             </div>
-          ) : error ? (
+          )}
+
+          {status === "error" && error && (
             <Alert variant="destructive" className="max-w-md mx-auto">
               <Terminal className="h-4 w-4" />
               <AlertTitle>載入錯誤</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-          ) : activeSponsors.length === 0 ? (
-            <p className="text-muted-foreground text-center">目前尚無合作夥伴。</p>
-          ) : activeSponsors.length === 1 ? (
-            <div className="flex justify-center">{renderSponsorCard(activeSponsors[0])}</div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8 items-center">
-              {activeSponsors.map(renderSponsorCard)}
-            </div>
+          )}
+
+          {status === "success" && (
+            <>
+              {activeSponsors.length === 0 ? (
+                <p className="text-muted-foreground text-center">目前尚無合作夥伴。</p>
+              ) : activeSponsors.length === 1 ? (
+                <div className="flex justify-center">{renderSponsorCard(activeSponsors[0])}</div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8 items-center">
+                  {activeSponsors.map(renderSponsorCard)}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

@@ -86,13 +86,8 @@ export function ActivityForm({
             return false
         }
 
-        if (!formData.description?.trim()) {
-            toast.error("請填寫活動描述")
-            return false
-        }
-
         if (formData.description.length > 500) {
-            toast.error("活動描述不能超過 500 字")
+            toast.error("活動說明不能超過 500 字")
             return false
         }
 
@@ -205,10 +200,10 @@ export function ActivityForm({
     }, [formData.femaleQuota, formData.maxParticipants, formData.femalePriority, setFormData]);
 
     return ( // <--- 確保這裡有括號
-        <div className="space-y-6">
+        <div className="space-y-8"> {/* Increased general spacing between sections */}
             {/* 基本資訊 */}
-            <div className="space-y-2">
-                <div className="text-sm font-medium dark:text-zinc-100">基本資訊</div>
+            <div className="space-y-4"> {/* Increased spacing within section */}
+                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">基本資訊</div> {/* Enhanced section title */}
                 <div className="space-y-2">
                     <Label htmlFor="title" className="dark:text-zinc-100">
                         活動標題 <span className="text-red-500">*</span>
@@ -240,8 +235,8 @@ export function ActivityForm({
             </div>
 
             {/* 時間設定 */}
-            <div className="space-y-2">
-                <div className="text-sm font-medium dark:text-zinc-100">時間設定</div>
+            <div className="space-y-4"> {/* Increased spacing within section */}
+                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">時間設定</div> {/* Enhanced section title */}
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <Label className="dark:text-zinc-100">活動日期與時間 <span className="text-red-500">*</span></Label>
@@ -328,8 +323,8 @@ export function ActivityForm({
             </div>
 
             {/* 地點設定 */}
-            <div className="space-y-2">
-                <div className="text-sm font-medium dark:text-zinc-100">地點設定</div>
+            <div className="space-y-4"> {/* Increased spacing within section */}
+                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">地點設定</div> {/* Enhanced section title */}
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="location" className="dark:text-zinc-100">
@@ -415,7 +410,7 @@ export function ActivityForm({
 
             {/* 活動設定 */}
             <div className="space-y-4">
-                <div className="text-sm font-medium dark:text-zinc-100">活動設定</div>
+                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">活動設定</div> {/* Enhanced section title */}
 
                 <div className="space-y-2">
                     <Label htmlFor="netType" className="dark:text-zinc-100">
@@ -447,7 +442,7 @@ export function ActivityForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="maxParticipants" className="dark:text-zinc-100">
-                            人數上限 <span className="text-red-500">*</span>
+                            人數上限（包含自己） <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             id="maxParticipants"

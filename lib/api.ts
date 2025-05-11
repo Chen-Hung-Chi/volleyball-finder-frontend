@@ -48,7 +48,7 @@ export const handleAuthError = (error: any) => {
       window.location.href = '/login';
     }
     return 'unauthorized';
-  }
+    }
 
   console.error('Unexpected auth error:', error);
   return 'error';
@@ -67,7 +67,7 @@ export const getAllSponsors = async (): Promise<Sponsor[]> => {
 // Fetch a single sponsor by ID
 export const getSponsor = async (id: string): Promise<Sponsor> => {
   const response = await api.get<Sponsor>(`/sponsors/${id}`);
-  return response.data;
+    return response.data;
 };
 
 // Create a new sponsor
@@ -79,4 +79,4 @@ export const createSponsor = async (data: SponsorFormData): Promise<void> => {
 export const updateSponsor = async (id: string, data: SponsorFormData): Promise<boolean> => {
   const response = await api.put<boolean>(`/sponsors/${id}`, data);
   return response.data; // Backend returns boolean
-};
+}; 

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LogIn, Moon, Sun, VibrateIcon as Volleyball } from "lucide-react"
+import { LogIn, Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { memo } from "react"
@@ -9,12 +9,15 @@ import { useRouter } from "next/navigation"
 import { UserMenu } from "@/components/auth/user-menu"
 import { useAuth } from "@/lib/auth-context"
 import { NotificationList } from "@/components/notification/NotificationList"
+import { faVolleyball } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 // 將 Logo 組件分離並記憶化
 const Logo = memo(function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-      <Volleyball className="h-6 w-6" />
+      <FontAwesomeIcon icon={faVolleyball} className="h-6 w-6" />
       <span>排球找隊友</span>
     </Link>
   )
@@ -23,7 +26,7 @@ const Logo = memo(function Logo() {
 // 將主題切換按鈕組件分離並記憶化
 const ThemeToggle = memo(function ThemeToggle() {
   const { theme, setTheme } = useTheme()
-  
+
   return (
     <Button
       variant="outline"
@@ -41,11 +44,11 @@ const ThemeToggle = memo(function ThemeToggle() {
 // 將登入按鈕組件分離並記憶化
 const LoginButton = memo(function LoginButton() {
   const router = useRouter()
-  
+
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
+    <Button
+      variant="outline"
+      size="sm"
       className="gap-2"
       onClick={() => router.push("/login")}
     >
@@ -63,11 +66,15 @@ function LoadingHeader() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 font-bold text-xl">
+              {/* 載入狀態的圖標佔位符 */}
+              {/* 注意：這裡的佔位符仍然是 div，不是 Font Awesome 圖標本身 */}
               <div className="h-6 w-6 animate-pulse bg-gray-200 rounded" />
+              {/* 載入狀態的文字佔位符 */}
               <div className="w-24 h-6 animate-pulse bg-gray-200 rounded" />
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* 載入狀態的按鈕佔位符 */}
             <div className="w-10 h-10 animate-pulse bg-gray-200 rounded" />
             <div className="w-10 h-10 animate-pulse bg-gray-200 rounded" />
             <div className="w-20 h-8 animate-pulse bg-gray-200 rounded" />
@@ -79,7 +86,6 @@ function LoadingHeader() {
 }
 
 export function Header() {
-  const { theme, setTheme } = useTheme()
   const { user, loading } = useAuth()
 
   // 如果正在載入，顯示載入中的 header
@@ -111,4 +117,3 @@ export function Header() {
     </header>
   )
 }
-
