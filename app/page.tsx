@@ -10,6 +10,7 @@ import { useLineCallback } from "@/lib/hooks/useLineCallback"
 import { useGlobalErrorHandler } from "@/lib/hooks/useGlobalErrorHandler"
 import { EmptyState } from "@/components/ui/EmptyState"
 import { useFcm } from "@/lib/hooks/use-Fcm"
+import { TodayNotice } from "@/components/notification/TodayNotice"
 
 function HomePageContent() {
   useLineCallback(); // Handles LINE login callback
@@ -28,6 +29,7 @@ function HomePageContent() {
 
   return (
     <div className="container max-w-7xl py-6">
+      <TodayNotice />
       <div className="space-y-6">
         <SearchForm onSearch={triggerSearch} initialValues={searchParams} />
 

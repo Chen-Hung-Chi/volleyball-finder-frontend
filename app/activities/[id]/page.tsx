@@ -214,7 +214,7 @@ export default function ActivityDetail() {
               <div className="flex items-center gap-2">
                 {/* 只有「登入 + 自己是建立者」才顯示 */}
                 {user && isCreator && (
-                  <Badge variant="secondary">你是建立者</Badge>
+                  <Badge variant="secondary">建立者</Badge>
                 )}
 
                 {/* 任何人都看得到活動狀態 */}
