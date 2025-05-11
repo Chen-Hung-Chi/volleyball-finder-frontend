@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { BellIcon } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/lib/utils';
 import { NotificationBellTriggerProps } from './type'; // Import from local type file
 
-export const NotificationBellTrigger = React.memo(({ 
-  unreadCount, 
-  onClick, 
-  isVisible 
+export const NotificationBellTrigger = React.memo(({
+  unreadCount,
+  onClick,
+  isVisible
 }: NotificationBellTriggerProps) => {
   return (
     <Button
@@ -22,9 +23,9 @@ export const NotificationBellTrigger = React.memo(({
       aria-expanded={isVisible}
       aria-haspopup="true"
     >
-      <BellIcon className="h-5 w-5" />
+      <FontAwesomeIcon icon={faBell} className="h-5 w-5" />
     </Button>
   );
 });
 
-NotificationBellTrigger.displayName = 'NotificationBellTrigger'; 
+NotificationBellTrigger.displayName = 'NotificationBellTrigger';

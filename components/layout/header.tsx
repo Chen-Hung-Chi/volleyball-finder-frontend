@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation"
 import { UserMenu } from "@/components/auth/user-menu"
 import { useAuth } from "@/lib/auth-context"
 import { NotificationList } from "@/components/notification/NotificationList"
-import { faVolleyball, faHandshake } from "@fortawesome/free-solid-svg-icons"
+import { faVolleyball, faChessQueen } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 const Logo = memo(() => (
@@ -57,7 +57,7 @@ const SponsorButton = () => (
       className="hover:bg-muted"
       aria-label="贊助商頁面"
     >
-      <FontAwesomeIcon icon={faHandshake} className="h-5 w-5 text-muted-foreground" />
+      <FontAwesomeIcon icon={faChessQueen} />
     </Button>
   </Link>
 )
