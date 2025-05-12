@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { cn, formatTaipeiTime } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import dayjs from 'dayjs';
 import { NotificationItemProps } from './type'; // Import from local type file
 
 export const NotificationItem = React.memo(({ notification }: NotificationItemProps) => (
@@ -19,7 +20,7 @@ export const NotificationItem = React.memo(({ notification }: NotificationItemPr
     </div>
     <div className="mt-1 flex justify-between items-center">
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        {formatTaipeiTime(notification.createdAt)}
+        {dayjs(notification.createdAt).format("YYYY/MM/DD HH:mm")}
       </p>
       {!notification.read && (
         <Button

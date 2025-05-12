@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { toast } from "react-toastify"
 import { addMonths, isBefore } from "date-fns"
-import { cn, getCurrentTaipeiTime, isBeforeTaipeiToday, formatTaipeiTime, startOfTaipeiDay } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { LOCATIONS, NET_TYPES } from '@/lib/constants'
 import { ActivityFormData, ActivityFormProps } from '@/lib/types/activity'
 import {
@@ -25,6 +25,10 @@ import {
 } from "@/components/ui/collapsible"
 import { useEffect, useCallback } from "react" // Added useCallback
 
+import dayjs from "dayjs"
+import "dayjs/locale/zh-tw"
+dayjs.locale("zh-tw")
+
 export function ActivityForm({
     formData,
     setFormData,
@@ -38,8 +42,9 @@ export function ActivityForm({
     locationRef,
     amountRef
 }: ActivityFormProps) {
-    const today = getCurrentTaipeiTime()
-    const maxDate = addMonths(today, 2)
+    const today = dayjs()
+    const todayBeg = today.startOf("day")
+    const maxDate = addMonths(today.toDate(), 2)
 
     const handleCityChange = (city: string) => {
         setFormData(prev => ({ ...prev, city, district: "" }))
@@ -96,7 +101,7 @@ export function ActivityForm({
             return false
         }
 
-        if (isBeforeTaipeiToday(formData.dateTime)) {
+        if (dayjs(formData.dateTime).isBefore(todayBeg)) {
             toast.error("活動日期不能早於今天")
             return false
         }
@@ -252,7 +257,7 @@ export function ActivityForm({
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {formData.dateTime ? formatTaipeiTime(formData.dateTime) : "選擇日期與時間"}
+                                        {formData.dateTime ? dayjs(formData.dateTime).format("YYYY/MM/DD HH:mm") : "選擇日期與時間"}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0 dark:bg-zinc-800 dark:border-zinc-700" align="start">
@@ -272,7 +277,7 @@ export function ActivityForm({
                                                 setFormData(prev => ({ ...prev, dateTime: null }));
                                             }
                                         }}
-                                        disabled={(d) => isBefore(d, startOfTaipeiDay(today)) || isBefore(maxDate, d)}
+                                        disabled={d => isBefore(d, todayBeg.toDate()) || isBefore(maxDate, d)}
                                         initialFocus
                                         className="dark:bg-zinc-800 dark:text-zinc-100"
                                     />

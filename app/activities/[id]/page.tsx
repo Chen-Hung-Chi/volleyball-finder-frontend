@@ -12,7 +12,8 @@ import { apiService } from "@/lib/apiService"
 import { Calendar, MapPin, Users, ArrowLeft, DollarSign, Star } from "lucide-react"
 import { ParticipantList } from "@/components/activity/ParticipantList"
 import Link from "next/link"
-import { formatTaipeiTime, cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import dayjs from "dayjs"
 import { useActivityDetails } from '@/lib/hooks/useActivityDetails'
 import { handleApiError } from '@/lib/error'
 import { AddToGoogleCalendarButton } from '@/components/activity/AddToGoogleCalendarButton'
@@ -231,7 +232,7 @@ export default function ActivityDetail() {
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>
-                  {activity.dateTime ? formatTaipeiTime(activity.dateTime) : '未設定時間'}
+                  {activity.dateTime ? dayjs(activity.dateTime).format("YYYY/MM/DD HH:mm") : "未設定時間"}
                   {activity.duration && ` (${activity.duration} 分鐘)`}
                 </span>
               </div>

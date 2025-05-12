@@ -14,7 +14,7 @@ import { ActivityCard } from "@/components/activity/ActivityCard";
 import { ActivityListSkeleton } from "@/components/activity/ActivityListSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useMyActivities } from "@/lib/hooks/useMyActivities";
-import { isFutureDate, isPastDate } from "@/lib/utils";
+import dayjs from "dayjs";
 
 export default function ActivitiesPage() {
   const router = useRouter();
@@ -40,13 +40,14 @@ export default function ActivitiesPage() {
   }, [authLoading, authUser, refetch, router]);
 
   /** 快取 + 記憶化，避免每次 render 重算 */
+  const now = dayjs();
   const upcomingActivities = useMemo(
-    () => activities.filter((a) => isFutureDate(a.dateTime)),
-    [activities]
+    () => activities.filter((a) => dayjs(a.dateTime).isAfter(now)),
+    [activities, now]
   );
   const pastActivities = useMemo(
-    () => activities.filter((a) => isPastDate(a.dateTime)),
-    [activities]
+    () => activities.filter((a) => dayjs(a.dateTime).isBefore(now)),
+    [activities, now]
   );
 
   /** 建立活動按鈕 handler */
