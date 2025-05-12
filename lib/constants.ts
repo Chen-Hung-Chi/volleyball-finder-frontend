@@ -1,3 +1,9 @@
+export const ROLES = [
+  { value: 'USER', label: '一般用戶' },
+  { value: 'SPONSOR', label: '贊助商' },
+  { value: 'ADMIN', label: '管理員' }
+] as const;
+
 export const POSITIONS = [
   { value: 'NONE', label: '無特定位置' },
   { value: 'SPIKER', label: '攻擊手' },
@@ -567,3 +573,5 @@ export const findCityByName = (name: string) =>
 
 export const findDistrictByName = (cityName: string, districtName: string) =>
   findCityByName(cityName)?.districts.find(district => district.name === districtName); 
+
+export type Role = typeof ROLES[number]['value'];

@@ -1,4 +1,4 @@
-import { CityCode, DistrictCode, Position, Level } from '../constants';
+import { CityCode, DistrictCode, Position, Level, Role } from '../constants';
 import type { PaginatedResponse, SearchParams } from './api';
 import type { User } from './user';
 
@@ -56,6 +56,7 @@ export interface ActivityParticipantDto {
   introduction?: string;
   userCreatedAt?: string;
   userUpdatedAt?: string;
+  role?: Role;
 }
 
 export interface ActivityWithParticipants extends Activity {

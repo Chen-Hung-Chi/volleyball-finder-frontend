@@ -67,9 +67,9 @@ export function ActivityForm({
             } else if (value === "" && (field === 'amount' || field === 'maxParticipants' || field === 'maleQuota' || field === 'femaleQuota')) {
                 // Handle clearing for other specific number fields if needed, e.g., set to 0 or a default
                 if (field === 'maxParticipants') {
-                    setFormData(prev => ({ ...prev, [field]: 1 })); // Default to 1 for maxParticipants
+                    setFormData(prev => ({ ...prev, [field]: 0 })); // allow blank -> 0
                 } else {
-                    setFormData(prev => ({ ...prev, [field]: 0 })); // Default to 0 for others
+                    setFormData(prev => ({ ...prev, [field]: 0 }));
                 }
             }
         }
@@ -93,6 +93,7 @@ export function ActivityForm({
 
         if (formData.description.length > 500) {
             toast.error("活動說明不能超過 500 字")
+            document.getElementById("description")?.focus()
             return false
         }
 
@@ -452,20 +453,10 @@ export function ActivityForm({
                         <Input
                             id="maxParticipants"
                             type="number"
-                            min="1"
+                            min="0"
                             max="100"
                             value={formData.maxParticipants}
-                            onChange={e => {
-                                const value = parseInt(e.target.value);
-                                if (!isNaN(value)) {
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        maxParticipants: Math.min(Math.max(value, 1), 100)
-                                    }));
-                                } else if (e.target.value === "") {
-                                    setFormData(prev => ({ ...prev, maxParticipants: 1 }));
-                                }
-                            }}
+                            onChange={e => handleNumberChange('maxParticipants', e.target.value)}
                             className={cn(
                                 "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
                                 isSubmitted && (formData.maxParticipants < 1 || formData.maxParticipants > 100) ? "border-red-500" : ""

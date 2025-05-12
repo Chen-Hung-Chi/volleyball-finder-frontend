@@ -19,14 +19,14 @@ export const apiService = {
     try {
       // 通知後端登出
       await api.post('/users/logout');
-  
+
       // 清掉 localStorage 裡的登入資訊
       window.localStorage.removeItem('token');
       window.localStorage.removeItem('fcm_token');
-  
+
       // 發送登出事件（讓其他地方也知道登出了）
       window.dispatchEvent(new Event('authStateChanged'));
-  
+
       // 選擇跳回登入畫面
       if (typeof window !== 'undefined') {
         window.location.href = '/';
@@ -101,22 +101,25 @@ export const apiService = {
     const participants = participantsRes.data;
     const captain = participants.find(p => p.isCaptain);
 
-    const captainAsUser: User | null = captain ? {
-      id: captain.userId,
-      lineId: captain.lineId ?? '',
-      nickname: captain.nickname,
-      realName: captain.realName,
-      position: captain.position as Position | undefined,
-      level: captain.level as Level | null,
-      volleyballAge: captain.volleyballAge,
-      avatar: captain.avatar,
-      city: captain.city as CityCode | undefined,
-      district: captain.district as DistrictCode | undefined,
-      introduction: captain.introduction,
-      gender: captain.gender,
-      createdAt: captain.userCreatedAt ?? new Date().toISOString(),
-      updatedAt: captain.userUpdatedAt ?? new Date().toISOString(),
-    } : null;
+    const captainAsUser: User | null = captain
+      ? {
+        id: captain.userId,
+        lineId: captain.lineId ?? '',
+        nickname: captain.nickname,
+        realName: captain.realName ?? '',
+        role: captain.role ?? 'USER',
+        position: captain.position as Position | undefined,
+        level: captain.level as Level | null,
+        volleyballAge: captain.volleyballAge ?? null,
+        avatar: captain.avatar ?? '',
+        city: captain.city as CityCode | undefined,
+        district: captain.district as DistrictCode | undefined,
+        introduction: captain.introduction ?? '',
+        gender: captain.gender,
+        createdAt: captain.userCreatedAt ?? new Date().toISOString(),
+        updatedAt: captain.userUpdatedAt ?? new Date().toISOString(),
+      }
+      : null;
 
     return { ...activity, participants, waitingList: [], captain: captainAsUser };
   },
@@ -159,10 +162,19 @@ export const apiService = {
   },
 
   markNotificationAsRead: async (id: string): Promise<void> => {
-    await api.put(`/notifications/${id}/read`);
+    if (!id) return;
+    try {
+      await api.put(`/notifications/${id}/read`);
+    } catch (error) {
+      console.error(`Failed to mark notification ${id} as read:`, error);
+    }
   },
 
   markAllNotificationsAsRead: async (): Promise<void> => {
-    await api.put('/notifications/read-all');
+    try {
+      await api.put('/notifications/read-all');
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
   },
 };

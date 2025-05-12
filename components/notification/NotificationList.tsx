@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { apiService } from '@/lib/apiService';
-// import { toast } from 'react-toastify';
 import { Notification } from "@/lib/types/notification";
 import { NotificationDropdown } from './NotificationDropdown';
 import { NotificationBellTrigger } from './NotificationBellTrigger';
@@ -65,7 +64,7 @@ export const NotificationList = React.memo(function NotificationList() {
     };
   }, [isVisible]);
 
-  const unreadCount = notifications.filter((n: Notification) => !n.read).length;
+  const unreadCount = notifications.filter((n: Notification) => !n.isRead).length;
 
   if (!user) {
     return null;
@@ -83,6 +82,7 @@ export const NotificationList = React.memo(function NotificationList() {
         isLoading={isLoading}
         error={error}
         notifications={notifications}
+        setNotifications={setNotifications}
       />
     </div>
   );

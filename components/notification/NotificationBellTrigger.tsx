@@ -10,16 +10,20 @@ export const NotificationBellTrigger = React.memo(({
   onClick,
   isVisible
 }: NotificationBellTriggerProps) => {
+  const hasUnread = unreadCount > 0;
+  const ariaLabel = hasUnread ? `通知，有 ${unreadCount} 則未讀` : '通知';
+
   return (
     <Button
+      type="button"
       variant="ghost"
       size="icon"
       className={cn(
         "bell-button relative", // Keep class for outside click detection
-        unreadCount > 0 && "after:absolute after:top-1 after:right-1 after:h-2 after:w-2 after:rounded-full after:bg-red-500"
+        hasUnread && "after:absolute after:top-1 after:right-1 after:h-2 after:w-2 after:rounded-full after:bg-red-500"
       )}
       onClick={onClick}
-      aria-label={`通知 ${unreadCount > 0 ? `，有 ${unreadCount} 則未讀` : ''}`}
+      aria-label={ariaLabel}
       aria-expanded={isVisible}
       aria-haspopup="true"
     >

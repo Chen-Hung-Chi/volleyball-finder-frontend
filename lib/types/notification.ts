@@ -3,7 +3,7 @@ export interface Notification {
   userId: string;
   title: string;
   content: string;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
   updatedAt: string;
 } 

@@ -10,6 +10,7 @@ export interface NotificationDropdownProps {
   error: string | null;
   notifications: Notification[];
   isVisible: boolean;
+  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 export interface NotificationBellTriggerProps {

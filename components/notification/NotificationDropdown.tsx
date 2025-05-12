@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Loader2 } from 'lucide-react';
+import { apiService } from "@/lib/apiService";
 import { NotificationItem } from './NotificationItem';
 import { NotificationDropdownProps } from './type'; // Import from local type file
 
@@ -9,6 +10,7 @@ export const NotificationDropdown = React.memo(({
   isLoading, 
   error, 
   notifications, 
+  setNotifications,
   isVisible 
 }: NotificationDropdownProps) => {
   if (!isVisible) {
@@ -29,8 +31,29 @@ export const NotificationDropdown = React.memo(({
     if (notifications.length === 0) {
       return <EmptyState title="沒有新通知" message="目前沒有任何通知" />;
     }
+
+    const handleMarkAllAsRead = async () => {
+      try {
+        await apiService.markAllNotificationsAsRead();
+        console.log("All notifications marked as read");
+        setNotifications(prev =>
+          prev.map(n => ({ ...n, isRead: true }))
+        );
+      } catch (err) {
+        console.error("Failed to mark all as read", err);
+      }
+    };
+
     return (
       <div className="max-h-96 overflow-y-auto">
+        <div className="flex justify-end p-2 border-b bg-muted">
+          <button
+            onClick={handleMarkAllAsRead}
+            className="text-sm text-primary hover:underline"
+          >
+            全部標為已讀
+          </button>
+        </div>
         {notifications.map((notification) => (
           <NotificationItem 
             key={notification.id} 
@@ -56,4 +79,4 @@ export const NotificationDropdown = React.memo(({
   );
 });
 
-NotificationDropdown.displayName = 'NotificationDropdown'; 
+NotificationDropdown.displayName = 'NotificationDropdown';

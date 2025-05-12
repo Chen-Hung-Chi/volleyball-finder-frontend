@@ -12,13 +12,13 @@ import Script from 'next/script'
 
 const inter = Inter({ subsets: ["latin"] })
 
-const currentYear = new Date().getFullYear()
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const currentYear = new Date().getFullYear()
+
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
@@ -49,6 +49,7 @@ export default function RootLayout({
               draggable
               pauseOnHover
               theme="light"
+              limit={2}
             />
           </AuthProvider>
         </ThemeProvider>
