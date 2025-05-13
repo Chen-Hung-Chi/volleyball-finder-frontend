@@ -29,6 +29,15 @@ import dayjs from "dayjs"
 import "dayjs/locale/zh-tw"
 dayjs.locale("zh-tw")
 
+/** Common dark‑theme input classes */
+const darkInputClasses = "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100";
+
+/** Utility to show an error toast and optionally focus a field */
+const showError = (msg: string, element?: HTMLElement | null) => {
+    toast.error(msg);
+    element?.focus();
+};
+
 export function ActivityForm({
     formData,
     setFormData,
@@ -80,36 +89,32 @@ export function ActivityForm({
         setIsSubmitted(true)
 
         if (!formData.title?.trim()) {
-            toast.error("請填寫活動標題")
-            titleRef.current?.focus()
+            showError("請填寫活動標題", titleRef.current)
             return false
         }
 
         if (formData.title.length > 20) {
-            toast.error("活動標題不能超過 20 字")
-            titleRef.current?.focus()
+            showError("活動標題不能超過 20 字", titleRef.current)
             return false
         }
 
         if (formData.description.length > 500) {
-            toast.error("活動說明不能超過 500 字")
-            document.getElementById("description")?.focus()
+            showError("活動說明不能超過 500 字", document.getElementById("description"))
             return false
         }
 
         if (!formData.dateTime) {
-            toast.error("請選擇活動日期與時間")
+            showError("請選擇活動日期與時間")
             return false
         }
 
         if (dayjs(formData.dateTime).isBefore(todayBeg)) {
-            toast.error("活動日期不能早於今天")
+            showError("活動日期不能早於今天")
             return false
         }
 
         if (!formData.location?.trim()) {
-            toast.error("請填寫活動地點")
-            locationRef.current?.focus()
+            showError("請填寫活動地點", locationRef.current)
             return false
         }
 
@@ -134,8 +139,7 @@ export function ActivityForm({
         }
 
         if (formData.amount < 0) {
-            toast.error("費用不能是負數")
-            amountRef.current?.focus()
+            showError("費用不能是負數", amountRef.current)
             return false
         }
 
@@ -222,7 +226,7 @@ export function ActivityForm({
                         maxLength={20}
                         placeholder="請輸入活動標題"
                         className={cn(
-                            "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                            darkInputClasses,
                             isSubmitted && !formData.title?.trim() ? "border-red-500" : ""
                         )}
                     />
@@ -235,7 +239,10 @@ export function ActivityForm({
                         value={formData.description}
                         onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                         placeholder="請輸入活動說明"
-                        className="min-h-[100px] dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100"
+                        className={cn(
+                            "min-h-[100px]",
+                            darkInputClasses
+                        )}
                     />
                 </div>
             </div>
@@ -252,7 +259,8 @@ export function ActivityForm({
                                     <Button
                                         variant="outline"
                                         className={cn(
-                                            "w-full justify-start text-left font-normal dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                            "w-full justify-start text-left font-normal",
+                                            darkInputClasses,
                                             !formData.dateTime && "text-muted-foreground dark:text-zinc-400",
                                             isSubmitted && !formData.dateTime && "border-red-500"
                                         )}
@@ -305,7 +313,7 @@ export function ActivityForm({
                                                     setFormData(prev => ({ ...prev, dateTime: newDateTime }));
                                                 }
                                             }}
-                                            className="w-full dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100"
+                                            className={cn("w-full", darkInputClasses)}
                                         />
                                     </div>
                                 </PopoverContent>
@@ -317,7 +325,7 @@ export function ActivityForm({
                                     value={formData.duration}
                                     onChange={e => handleNumberChange('duration', e.target.value)}
                                     className={cn(
-                                        "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                        darkInputClasses,
                                         isSubmitted && formData.duration < 30 ? "border-red-500" : ""
                                     )}
                                 />
@@ -344,7 +352,7 @@ export function ActivityForm({
                             maxLength={20}
                             placeholder="請輸入活動地點"
                             className={cn(
-                                "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                darkInputClasses,
                                 isSubmitted && !formData.location?.trim() ? "border-red-500" : ""
                             )}
                         />
@@ -361,7 +369,7 @@ export function ActivityForm({
                                 onValueChange={handleCityChange}
                             >
                                 <SelectTrigger className={cn(
-                                    "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                    darkInputClasses,
                                     isSubmitted && !formData.city ? "border-red-500" : ""
                                 )}>
                                     <SelectValue placeholder="選擇城市" className="dark:text-zinc-400" />
@@ -389,7 +397,7 @@ export function ActivityForm({
                                 disabled={!formData.city}
                             >
                                 <SelectTrigger className={cn(
-                                    "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                    darkInputClasses,
                                     isSubmitted && !formData.district ? "border-red-500" : ""
                                 )}>
                                     <SelectValue placeholder="選擇行政區" className="dark:text-zinc-400" />
@@ -428,7 +436,7 @@ export function ActivityForm({
                             setFormData(prev => ({ ...prev, netType: value }))
                         }
                     >
-                        <SelectTrigger className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100">
+                        <SelectTrigger className={darkInputClasses}>
                             <SelectValue placeholder="選擇網別" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-zinc-800 dark:border-zinc-700">
@@ -458,7 +466,7 @@ export function ActivityForm({
                             value={formData.maxParticipants}
                             onChange={e => handleNumberChange('maxParticipants', e.target.value)}
                             className={cn(
-                                "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                darkInputClasses,
                                 isSubmitted && (formData.maxParticipants < 1 || formData.maxParticipants > 100) ? "border-red-500" : ""
                             )}
                         />
@@ -476,7 +484,7 @@ export function ActivityForm({
                             value={formData.amount}
                             onChange={e => handleNumberChange('amount', e.target.value)}
                             className={cn(
-                                "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                darkInputClasses,
                                 isSubmitted && formData.amount < 0 ? "border-red-500" : ""
                             )}
                         />
@@ -542,7 +550,7 @@ export function ActivityForm({
                                         }
                                     }}
                                     className={cn(
-                                        "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                        darkInputClasses,
                                         (isSubmitted && (formData.maleQuota > formData.maxParticipants || formData.maleQuota < -1)) ? "border-red-500" : ""
                                     )}
                                 />
@@ -585,7 +593,7 @@ export function ActivityForm({
                                         }
                                     }}
                                     className={cn(
-                                        "dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100",
+                                        darkInputClasses,
                                         (isSubmitted && (formData.femaleQuota > formData.maxParticipants || formData.femaleQuota < -1)) ? "border-red-500" : ""
                                     )}
                                 />

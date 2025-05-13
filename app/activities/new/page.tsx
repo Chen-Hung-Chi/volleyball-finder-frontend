@@ -10,6 +10,12 @@ import { apiService } from "@/lib/apiService"
 import { LOCATIONS } from "@/lib/constants"
 import { ActivityForm } from "@/components/activity/ActivityForm"
 import { handleApiError } from "@/lib/error"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 interface FormData {
   title: string
@@ -91,7 +97,7 @@ export default function NewActivity() {
     const activityData = {
       title: formData.title.trim(),
       description: formData.description?.trim() || null,
-      dateTime: formData.dateTime!.toISOString(),
+      dateTime: dayjs(formData.dateTime!).tz("Asia/Taipei").format("YYYY-MM-DDTHH:mm:ss"),
       duration: formData.duration,
       location: formData.location.trim(),
       maxParticipants: formData.maxParticipants,

@@ -11,6 +11,12 @@ import { LOCATIONS } from "@/lib/constants"
 import { format } from "date-fns"
 import { ActivityForm } from "@/components/activity/ActivityForm"
 import { handleApiError } from "@/lib/error"
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface FormData {
   title: string
@@ -147,7 +153,7 @@ export default function EditActivity() {
     const activityData = {
       title: formData.title.trim(),
       description: formData.description?.trim() || null,
-      dateTime: formData.dateTime!.toISOString(),
+      dateTime: dayjs(formData.dateTime!).tz("Asia/Taipei").format("YYYY-MM-DDTHH:mm:ss"),
       duration: formData.duration,
       location: formData.location.trim(),
       maxParticipants: formData.maxParticipants,
@@ -159,7 +165,7 @@ export default function EditActivity() {
       femaleQuota: formData.femaleQuota,
       femalePriority: formData.femalePriority,
     }
-    
+
     try {
       setIsSaving(true)
       const activity = await apiService.updateActivity(activityId, activityData)
@@ -205,7 +211,7 @@ export default function EditActivity() {
     <div className="container mx-auto p-4 max-w-2xl">
       <Card className="p-6 dark:bg-zinc-900 dark:border-zinc-800">
         <h1 className="text-2xl font-bold mb-6 dark:text-zinc-100">編輯活動</h1>
-        
+
         <ActivityForm
           formData={formData}
           setFormData={setFormData}
@@ -222,15 +228,15 @@ export default function EditActivity() {
 
         {/* 按鈕區域 */}
         <div className="flex justify-end space-x-2 mt-6">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => router.back()}
             className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >
             取消
           </Button>
-          <Button 
-            onClick={handleSave} 
+          <Button
+            onClick={handleSave}
             disabled={isSaving}
             className="dark:hover:bg-primary/90"
           >
