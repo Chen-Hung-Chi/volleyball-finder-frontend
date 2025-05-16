@@ -1,6 +1,7 @@
 // lib/firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -15,6 +16,7 @@ const firebaseConfig = {
 // Initialize Firebase
 
 const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
 
 let analytics: ReturnType<typeof getAnalytics> | null = null;
 
@@ -27,4 +29,4 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { firebaseApp, analytics };
+export { firebaseApp, analytics, auth };

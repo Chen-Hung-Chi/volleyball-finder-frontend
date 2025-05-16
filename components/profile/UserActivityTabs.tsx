@@ -28,7 +28,7 @@ export function UserActivityTabs({ activities }: UserActivityTabsProps) {
         {upcomingCount > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             {upcomingActivities.map(activity => (
-              <ActivityCard key={activity.id} activity={activity} />
+              <ActivityCard key={activity.id} activity={activity} requireVerification={activity.requireVerification} />
             ))}
           </div>
         ) : (
@@ -42,7 +42,7 @@ export function UserActivityTabs({ activities }: UserActivityTabsProps) {
         {pastCount > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             {pastActivities.map(activity => (
-              <ActivityCard key={activity.id} activity={activity} isPast={true} />
+              <ActivityCard key={activity.id} activity={activity} isPast={true} requireVerification={activity.requireVerification} />
             ))}
           </div>
         ) : (

@@ -5,12 +5,14 @@ import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { AvatarSelectorProps } from "@/lib/types/ui" // Import props type
+import { AvatarSelectorProps as InternalAvatarSelectorProps } from "@/lib/types/ui" // Import props type
 
-export function AvatarSelector({ value, onChange }: AvatarSelectorProps) {
+// Extend props to include className
+interface AvatarSelectorProps extends InternalAvatarSelectorProps {
+  className?: string;
+}
+
+export function AvatarSelector({ value, onChange, className }: AvatarSelectorProps) {
   const [selectedSeed, setSelectedSeed] = useState<number | null>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -48,7 +50,7 @@ export function AvatarSelector({ value, onChange }: AvatarSelectorProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", className)}>
       <div className="flex items-center gap-4">
         <Avatar className="h-20 w-20">
           <AvatarImage 

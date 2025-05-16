@@ -32,6 +32,9 @@ interface FormData {
   maleQuota: number
   femaleQuota: number
   femalePriority: boolean
+  requireVerification: boolean
+  maleCount: number
+  femaleCount: number
 }
 
 export default function EditActivity() {
@@ -56,7 +59,10 @@ export default function EditActivity() {
     netType: 'MIXED',
     maleQuota: 0,
     femaleQuota: 0,
-    femalePriority: false
+    femalePriority: false,
+    maleCount: 0,
+    femaleCount: 0,
+    requireVerification: false,
   })
 
   // 參考用於聚焦的元素
@@ -107,7 +113,10 @@ export default function EditActivity() {
           netType: activity.netType || 'MIXED',
           maleQuota: activity.maleQuota || 0,
           femaleQuota: activity.femaleQuota || 0,
-          femalePriority: activity.femalePriority || false
+          femalePriority: activity.femalePriority || false,
+          maleCount: activity.maleCount ?? 0,
+          femaleCount: activity.femaleCount ?? 0,
+          requireVerification: activity.requireVerification ?? false,
         })
       } catch (error: any) {
         handleApiError(error, router)
@@ -164,6 +173,9 @@ export default function EditActivity() {
       maleQuota: formData.maleQuota,
       femaleQuota: formData.femaleQuota,
       femalePriority: formData.femalePriority,
+      requireVerification: formData.requireVerification,
+      maleCount: formData.maleCount ?? 0,
+      femaleCount: formData.femaleCount ?? 0,
     }
 
     try {

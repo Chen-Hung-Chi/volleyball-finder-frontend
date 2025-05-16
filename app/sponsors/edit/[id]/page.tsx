@@ -69,8 +69,8 @@ export default function EditSponsorPage() {
     fetchSponsorData();
   }, [sponsorId, user, authLoading, router]);
 
-  const handleSubmit = async (data: SponsorFormData): Promise<boolean> => {
-    if (!sponsorId) return false;
+  const handleSubmit = async (data: SponsorFormData): Promise<void> => {
+    if (!sponsorId) return;
     setIsSubmitting(true);
     try {
       // 移除 linePayChannelId/Secret 的送出
@@ -80,7 +80,6 @@ export default function EditSponsorPage() {
         router.push('/sponsors');
         router.refresh();
       }
-      return success;
     } finally {
       setIsSubmitting(false);
     }

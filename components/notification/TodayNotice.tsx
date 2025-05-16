@@ -14,14 +14,19 @@ const STORAGE_KEY = "vf_notice_dismissed_date"
 export function TodayNotice() {
   const [open, setOpen] = useState(false)
   const [dontShow, setDontShow] = useState(false)
+  const [ready, setReady] = useState(false)
   const router = useRouter()
   const { user } = useAuth()
 
   useEffect(() => {
+    if (user === undefined) return
     const today = dayjs().format("YYYY-MM-DD")
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored !== today) setOpen(true)
-  }, [])
+    setReady(true)
+  }, [user])
+
+  if (!ready) return null
 
   const handleClose = () => {
     if (dontShow) {
@@ -37,7 +42,7 @@ export function TodayNotice() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md animate-in zoom-in-90 fade-in">
+      <DialogContent className="sm:max-w-md animate-in zoom-in-90 fade-in" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
             <Rocket className="h-5 w-5 text-primary" />

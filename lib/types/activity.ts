@@ -24,6 +24,7 @@ export interface Activity {
   maleQuota?: number;
   femaleQuota?: number;
   femalePriority?: boolean;
+  requireVerification?: boolean;
 }
 
 export interface ActivityParticipant {
@@ -85,6 +86,9 @@ export interface ActivityFormData {
   maleQuota: number
   femaleQuota: number
   femalePriority: boolean
+  maleCount: number
+  femaleCount: number
+  requireVerification: boolean
 }
 
 export interface ActivityFormProps {

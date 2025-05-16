@@ -186,6 +186,12 @@ export function ActivityForm({
             return false
         }
 
+        // 女性優先時，男生名額不能為 0
+        if (formData.femalePriority && formData.maleQuota === 0) {
+            toast.error("開啟女性優先時，男生名額不能為 0")
+            return false
+        }
+
         if (formData.maleQuota > 0 && formData.femaleQuota > 0) {
             if (formData.maleQuota + formData.femaleQuota !== formData.maxParticipants) {
                 toast.error("男女名額總和必須等於人數上限")
@@ -424,7 +430,22 @@ export function ActivityForm({
 
             {/* 活動設定 */}
             <div className="space-y-4">
-                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">活動設定</div> {/* Enhanced section title */}
+                <div className="text-lg font-semibold border-b pb-2 mb-4 dark:text-zinc-100 dark:border-zinc-700">活動設定</div>
+
+                {/* 新增 需要實名制 Switch */}
+                <div className="flex items-center space-x-2">
+                    <Switch
+                        id="requireVerification"
+                        checked={!!formData.requireVerification}
+                        onCheckedChange={checked =>
+                            setFormData(prev => ({ ...prev, requireVerification: checked }))
+                        }
+                        className="dark:[&>span]:bg-zinc-600 dark:data-[state=checked]:[&>span]:bg-primary"
+                    />
+                    <Label htmlFor="requireVerification" className="dark:text-zinc-100">
+                        需要實名制 <span className="text-xs text-muted-foreground">(完成實名認證者才能參加)</span>
+                    </Label>
+                </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="netType" className="dark:text-zinc-100">

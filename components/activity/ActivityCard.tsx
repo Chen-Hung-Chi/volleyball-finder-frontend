@@ -2,7 +2,7 @@
 import { useMemo } from "react"
 import Link from "next/link"
 import dayjs from "dayjs"
-import { Calendar, MapPin, Users, DollarSign, Info, ArrowRight } from "lucide-react"
+import { Calendar, MapPin, Users, DollarSign, Info, ArrowRight, ShieldCheck } from "lucide-react"
 
 import { Activity } from "@/lib/types"
 import { NET_TYPES } from "@/lib/constants"
@@ -14,9 +14,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface ActivityCardProps {
   activity: Activity
+  isPast?: boolean
+  requireVerification?: boolean
 }
 
-export function ActivityCard({ activity }: ActivityCardProps) {
+export function ActivityCard({ activity, isPast, requireVerification }: ActivityCardProps) {
   /** ======== 衍生資料 memo ======== */
   const {
     locationString,
@@ -72,16 +74,16 @@ export function ActivityCard({ activity }: ActivityCardProps) {
         <CardHeader className="p-4 pb-2">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1 space-y-1.5 pr-8">
-              <CardTitle className="break-words text-lg font-semibold leading-tight">
-                {activity.title}
-              </CardTitle>
-
+              <div className="flex items-center gap-2">
+                <CardTitle className="break-words text-lg font-semibold leading-tight">
+                  {activity.title}
+                </CardTitle>
+              </div>
               <div className={cn(
                 "flex flex-wrap items-center gap-2 text-sm text-muted-foreground",
                 hoverTxt
               )}>
                 <span>{netTypeLabel}</span>
-
                 {activity.femalePriority && (
                   <>
                     <span className="text-xs">•</span>
@@ -107,7 +109,6 @@ export function ActivityCard({ activity }: ActivityCardProps) {
                 )}
               </div>
             </div>
-
             {/* 狀態 Badge */}
             <Badge
               variant={status.variant}
@@ -155,6 +156,14 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               <DollarSign className="mr-2 h-4 w-4 shrink-0" />
               <span>{activity.amount > 0 ? `${activity.amount} 元` : "免費"}</span>
             </div>
+
+            {/* 實名制報名 */}
+            {requireVerification && (
+              <div className="col-span-2 flex items-center gap-1 text-blue-600 mt-2">
+                <ShieldCheck className="h-5 w-5" />
+                <span className="font-medium">需要實名制報名</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -16,6 +16,7 @@ export function useProfileForm() {
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
+    mode: 'onChange',
     // Default values are set in the useEffect after fetching user data
   });
 
@@ -50,6 +51,7 @@ export function useProfileForm() {
           gender: userData.gender || 'MALE',
           introduction: userData.introduction || '',
           avatar: userData.avatar || '',
+          phone: userData.phone || '',
         });
       } catch (err: any) {
         console.error('[Profile Fetch Error]:', err);

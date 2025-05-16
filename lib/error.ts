@@ -9,7 +9,6 @@ export interface ApiErrorResponseData {
 
 export const handleApiError = (error: any, router?: AppRouterInstance) => {
   const apiErrorData: Partial<ApiErrorResponseData> = error?.response?.data || {};
-  const code = apiErrorData.code;
   const message = apiErrorData.message;
 
   // 顯示後端的 message，如果有的話

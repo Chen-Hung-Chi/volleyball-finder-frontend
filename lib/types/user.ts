@@ -14,6 +14,8 @@ export interface User {
   city?: CityCode;
   district?: DistrictCode;
   introduction?: string;
+  phone?: string;
+  isVerified?: boolean;
   createdAt: string;
   updatedAt: string;
   bio?: string;

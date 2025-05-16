@@ -4,6 +4,13 @@ import { Activity, ActivityWithParticipants, ActivityParticipantDto, User } from
 import { Position, Level, CityCode, DistrictCode } from './constants';
 import { ActivityCreate, ActivityUpdate, ActivityJoinRequest, SearchParams } from './types/api';
 
+// Ideally, this interface would go into a central types.ts file
+export interface CaptainViewParticipantDetails {
+  id: string;
+  phone?: string;
+  realName?: string;
+}
+
 export const apiService = {
   isAuthenticated: async (): Promise<boolean> => {
     try {
@@ -122,6 +129,15 @@ export const apiService = {
       : null;
 
     return { ...activity, participants, waitingList: [], captain: captainAsUser };
+  },
+
+  getActivityParticipantDetailsForCaptain: async (activityId: string, userIds: string[]): Promise<CaptainViewParticipantDetails[]> => {
+    if (userIds.length === 0) {
+      return [];
+    }
+    const idsParam = userIds.join(',');
+    const res = await api.get<CaptainViewParticipantDetails[]>(`/activities/${activityId}/users?ids=${idsParam}`);
+    return res.data;
   },
 
   createActivity: async (data: ActivityCreate): Promise<Activity> => {
