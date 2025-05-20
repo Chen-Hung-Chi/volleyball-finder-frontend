@@ -8,7 +8,6 @@ import { ActivityCreate, ActivityUpdate, ActivityJoinRequest, SearchParams } fro
 export interface CaptainViewParticipantDetails {
   id: string;
   phone?: string;
-  realName?: string;
 }
 
 export const apiService = {

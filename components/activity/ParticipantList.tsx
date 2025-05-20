@@ -14,9 +14,10 @@ interface ParticipantListProps {
   currentUserId: string;
   activityId: string;
   participantDetailsForCaptainView?: Map<string, CaptainViewParticipantDetails> | null;
+  requireVerification?: boolean;
 }
 
-export function ParticipantList({ participants, isWaiting = false, participantDetailsForCaptainView }: ParticipantListProps) {
+export function ParticipantList({ participants, isWaiting = false, participantDetailsForCaptainView, requireVerification = false }: ParticipantListProps) {
   return (
     <Card>
       <CardHeader>
@@ -47,16 +48,16 @@ export function ParticipantList({ participants, isWaiting = false, participantDe
                         isCaptain={participant.isCaptain}
                         isWaiting={isWaiting}
                         gender={participant.gender}
+                        realName={participant.realName}
+                        requireVerification={requireVerification}
                       />
                     </Link>
                   </div>
                   {captainDetails && (
                     <Card className="p-2 text-xs ml-6 bg-muted/70 dark:bg-muted/40 border border-muted-foreground/30 rounded-md">
-                      {(captainDetails.realName || captainDetails.phone) ? (
+                      {captainDetails.phone ? (
                         <p className="text-foreground/80 dark:text-foreground/70">
-                          {captainDetails.realName && `姓名: ${captainDetails.realName}`}
-                          {captainDetails.realName && captainDetails.phone && " | "}
-                          {captainDetails.phone && `電話: ${captainDetails.phone}`}
+                          電話: {captainDetails.phone}
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground italic">無詳細報名資訊</p>

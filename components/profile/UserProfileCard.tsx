@@ -66,12 +66,6 @@ export function UserProfileCard({ user, isCurrentUser }: UserProfileCardProps) {
                   </span>
                 )}
               </div>
-              {user.isVerified && user.realName ? (
-                <span className="flex items-center gap-1 mt-2 text-base font-semibold text-muted-foreground">
-                  <FontAwesomeIcon icon={faIdCard} className="text-gray-400" />
-                  {user.realName}
-                </span>
-              ) : null}
               {!user.isVerified ? (
                 <CardDescription className="text-base text-muted-foreground">{user.realName}</CardDescription>
               ) : null}

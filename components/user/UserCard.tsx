@@ -19,7 +19,9 @@ export function UserCard({
   isCaptain = false,
   isWaiting = false,
   gender = null,
-  onClick
+  onClick,
+  realName,
+  requireVerification
 }: UserCardProps) {
   const router = useRouter();
 
@@ -68,7 +70,15 @@ export function UserCard({
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-medium truncate">{nickname}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-medium truncate">{nickname}</span>
+            {requireVerification && realName && (
+              <>
+                <span className="text-xs text-muted-foreground opacity-60">|</span>
+                <span className="text-xs text-muted-foreground truncate">{realName}</span>
+              </>
+            )}
+          </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             {isCaptain && <Badge variant="default">隊長</Badge>}
             {isWaiting && <Badge variant="secondary">候補</Badge>}

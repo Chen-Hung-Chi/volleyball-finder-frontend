@@ -375,6 +375,7 @@ export default function ActivityDetail() {
               currentUserId={user?.id ?? ""}
               activityId={activity.id}
               participantDetailsForCaptainView={participantDetailsForCaptainView}
+              requireVerification={activity.requireVerification}
             />
             {activity.participants.length > activity.maxParticipants && (
               <ParticipantList
@@ -384,6 +385,7 @@ export default function ActivityDetail() {
                 currentUserId={user?.id ?? ""}
                 activityId={activity.id}
                 participantDetailsForCaptainView={participantDetailsForCaptainView}
+                requireVerification={activity.requireVerification}
               />
             )}
           </>

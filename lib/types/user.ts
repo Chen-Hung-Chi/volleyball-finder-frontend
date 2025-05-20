@@ -39,4 +39,6 @@ export interface UserCardProps {
   isWaiting?: boolean;
   gender?: Gender | null;
   onClick?: () => void;
+  realName?: string;
+  requireVerification?: boolean;
 } 
