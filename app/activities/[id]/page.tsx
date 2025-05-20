@@ -336,11 +336,15 @@ export default function ActivityDetail() {
 
             {user && (
               <div className="flex flex-col sm:flex-row justify-end items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
-                {isCreator ? (
+                {/* 隊長可多看到編輯活動 */}
+                {isCreator && (
                   <Button onClick={() => router.push(`/activities/${activity.id}/edit`)}>
                     編輯活動
                   </Button>
-                ) : !isPastActivity && isParticipant ? (
+                )}
+
+                {/* 已參加者可看到取消報名、加到 Google 行事曆 */}
+                {!isPastActivity && isParticipant && (
                   <>
                     <AddToGoogleCalendarButton
                       title={activity.title}
@@ -353,7 +357,10 @@ export default function ActivityDetail() {
                       {isLeaving ? "取消報名中..." : "取消報名"}
                     </Button>
                   </>
-                ) : !isPastActivity && !isFullWithWaitingList && (
+                )}
+
+                {/* 沒參加的人可看到報名（不論是不是隊長，只要沒參加都可報名或候補） */}
+                {!isPastActivity && !isParticipant && !isFullWithWaitingList && (
                   <Button onClick={handleJoin} disabled={isJoining}>
                     {isJoining
                       ? "報名中..."
