@@ -63,12 +63,10 @@ export function getActivityBadgeStatus(
       : activity.currentParticipants ?? 0
 
   const { maxParticipants } = activity
-  const isEmpty = participantsCount === 0
   const isAlmostFull = participantsCount >= maxParticipants * 0.8
   const isFull = participantsCount >= maxParticipants
 
   if (isFull) return { variant: "destructive" as const, label: "已額滿", className: "" }
-  if (isEmpty) return { variant: "outline" as const, label: "招募中", className: "" }
   if (isAlmostFull) return { variant: "secondary" as const, label: "即將額滿", className: "" }
   return { variant: "default" as const, label: "招募中", className: "" }
 }

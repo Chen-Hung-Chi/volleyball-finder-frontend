@@ -83,10 +83,37 @@ export function ActivityCard({ activity, isPast, requireVerification }: Activity
                 "flex flex-wrap items-center gap-2 text-sm text-muted-foreground",
                 hoverTxt
               )}>
-                <span>{netTypeLabel}</span>
+                {/* 實名制放最前面 */}
+                {requireVerification && (
+                  <>
+                    <span className="flex items-center gap-1 text-blue-500">
+                      <ShieldCheck className="h-5 w-5" />
+                      <span className="font-small">實名制</span>
+                    </span>
+                    {/* 若後面還有內容才顯示 | */}
+                    {(netTypeLabel || activity.femalePriority) && <span className="text-xs">|</span>}
+                  </>
+                )}
+                {/* 網別 */}
+                {netTypeLabel && (
+                  <span
+                    className={
+                      netTypeLabel === "男網"
+                        ? "text-blue-500"
+                        : netTypeLabel === "女網"
+                          ? "text-pink-500"
+                          : netTypeLabel === "混網"
+                            ? "text-purple-500"
+                            : ""
+                    }
+                  >
+                    {netTypeLabel}
+                  </span>
+                )}
+                {/* 女生優先 */}
                 {activity.femalePriority && (
                   <>
-                    <span className="text-xs">•</span>
+                    {netTypeLabel && <span className="text-xs">|</span>}
                     <TooltipProvider delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger
@@ -118,7 +145,6 @@ export function ActivityCard({ activity, isPast, requireVerification }: Activity
             </Badge>
           </div>
         </CardHeader>
-
         {/* Content */}
         <CardContent className="flex-grow p-4 pt-3">
           <div className={cn(
@@ -157,13 +183,6 @@ export function ActivityCard({ activity, isPast, requireVerification }: Activity
               <span>{activity.amount > 0 ? `${activity.amount} 元` : "免費"}</span>
             </div>
 
-            {/* 實名制報名 */}
-            {requireVerification && (
-              <div className="col-span-2 flex items-center gap-1 text-blue-600 mt-2">
-                <ShieldCheck className="h-5 w-5" />
-                <span className="font-medium">需要實名制報名</span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
