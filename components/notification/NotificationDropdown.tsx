@@ -57,7 +57,8 @@ export const NotificationDropdown = React.memo(({
         {notifications.map((notification) => (
           <NotificationItem 
             key={notification.id} 
-            notification={notification} 
+            notification={notification}
+            setNotifications={setNotifications}
           />
         ))}
       </div>

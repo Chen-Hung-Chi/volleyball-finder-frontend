@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ActivityWithParticipants, User } from '@/lib/types';
 import { NET_TYPES, LOCATIONS } from '@/lib/constants';
 import { getActivityBadgeStatus } from '@/lib/utils';
+import { apiService } from '@/lib/apiService';
 
 // Define the expected shape for the status object
 interface ActivityStatus {
@@ -11,6 +12,27 @@ interface ActivityStatus {
 }
 
 export const useActivityDetails = (activity: ActivityWithParticipants | null, user: User | null) => {
+  const [creatorNickname, setCreatorNickname] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activity?.createdBy) {
+      const fetchCreatorNickname = async () => {
+        try {
+          // Ensure activity.createdBy is treated as string if it's a number
+          const creator = await apiService.getUserProfile(String(activity.createdBy));
+          setCreatorNickname(creator.nickname);
+        } catch (error) {
+          console.error("Error fetching creator nickname in useActivityDetails:", error);
+          // Fallback to ID or null if fetch fails, to prevent broken UI
+          setCreatorNickname(String(activity.createdBy)); 
+        }
+      };
+      fetchCreatorNickname();
+    } else {
+      setCreatorNickname(null); // Reset if no activity or createdBy
+    }
+  }, [activity?.createdBy]); // Dependency: activity.createdBy
+
   return useMemo(() => {
     const defaultStatus: ActivityStatus = { label: '未知', variant: 'secondary', className: '' };
 
@@ -24,6 +46,7 @@ export const useActivityDetails = (activity: ActivityWithParticipants | null, us
         status: defaultStatus, // Use defined default
         isFullWithWaitingList: false,
         locationString: '',
+        creatorNickname: null, // Added default creatorNickname
       };
     }
 
@@ -44,7 +67,8 @@ export const useActivityDetails = (activity: ActivityWithParticipants | null, us
       status,
       isFullWithWaitingList,
       locationString,
+      creatorNickname, // Added creatorNickname to return object
     };
   // Recalculate whenever activity or user changes
-  }, [activity, user]);
+  }, [activity, user, creatorNickname]); // Added creatorNickname to dependency array
 }; 

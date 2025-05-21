@@ -42,7 +42,8 @@ export default function ActivityDetail() {
     netTypeLabel,
     status,
     isFullWithWaitingList,
-    locationString
+    locationString,
+    creatorNickname
   } = useActivityDetails(activity, user)
 
   const fetchActivity = useCallback(async () => {
@@ -242,10 +243,10 @@ export default function ActivityDetail() {
                 <CardDescription>
                   由{' '}
                   <Link
-                    href={`/profile/${activity.createdBy}?activityId=${activity.id}`}
+                    href={`/profile/${activity.createdBy}`}
                     className="hover:underline"
                   >
-                    {activity.captain?.nickname}
+                    {creatorNickname}
                   </Link>{' '}
                   建立
                 </CardDescription>

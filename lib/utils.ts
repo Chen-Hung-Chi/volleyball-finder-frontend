@@ -3,6 +3,7 @@
 // ──────────────────────────────────────────────────────────────
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import React from 'react'
 
 import dayjs from "dayjs"
 import "dayjs/locale/zh-tw"           // 只影響 dayjs().format() 的中文顯示
