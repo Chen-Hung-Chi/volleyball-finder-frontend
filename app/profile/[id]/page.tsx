@@ -66,8 +66,6 @@ export default function ProfilePage() {
     )
   }
 
-  const isCurrentUser = currentUser?.id === user.id;
-
   return (
     <div className="container max-w-5xl py-6">
       <Button variant="outline" onClick={() => router.back()} className="mb-4 flex items-center space-x-2 px-4 py-2">
@@ -76,11 +74,7 @@ export default function ProfilePage() {
       </Button>
 
       <div className="space-y-6">
-        <UserProfileCard 
-          user={user} 
-          isCurrentUser={isCurrentUser} 
-        />
-
+        <UserProfileCard user={user} />
         <UserActivityTabs activities={activities} />
       </div>
     </div>

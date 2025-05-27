@@ -10,7 +10,6 @@ import { faCheckCircle, faIdCard } from '@fortawesome/free-solid-svg-icons';
 
 interface UserProfileCardProps {
   user: User;
-  isCurrentUser: boolean;
 }
 
 const ProfileDetailBadge = ({ label, value }: { label: string, value: string | number | undefined | null }) => {
@@ -40,9 +39,7 @@ const ProfileDetailBadge = ({ label, value }: { label: string, value: string | n
   );
 };
 
-export function UserProfileCard({ user, isCurrentUser }: UserProfileCardProps) {
-  const router = useRouter();
-
+export function UserProfileCard({ user }: UserProfileCardProps) {
   return (
     <Card className="border border-border/40 shadow-sm hover:shadow-md transition-shadow duration-200">
       <CardHeader className="p-5 border-b rounded-t-md">
@@ -71,9 +68,6 @@ export function UserProfileCard({ user, isCurrentUser }: UserProfileCardProps) {
               ) : null}
             </div>
           </div>
-          {isCurrentUser && (
-            <Button variant="outline" size="sm" onClick={() => router.push('/profile')}>編輯資料</Button>
-          )}
         </div>
       </CardHeader>
       <hr className="border-border/30 dark:border-border/20" />
